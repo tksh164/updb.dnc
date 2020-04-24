@@ -68,9 +68,6 @@ namespace updbcmd
     {
         public string UpdatePackageFilePath { get; private set; }
 
-        public UnknownUpdatePackageTypeException()
-        {}
-
         public UnknownUpdatePackageTypeException(string message) : base(message)
         {}
 
