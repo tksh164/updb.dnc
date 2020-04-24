@@ -6,7 +6,7 @@ namespace updbcmd
     {
         static void Main(string[] args)
         {
-            char[] trimChars = new char[] { ' ', '\t', '"' };
+            char[] trimChars = new char[] { ' ', '\t', '"', '\'' };
             while (true)
             {
                 var filePath = Console.ReadLine().Trim(trimChars);
