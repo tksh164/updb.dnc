@@ -57,7 +57,7 @@ namespace updbcmd
                 return buffer;
             }
 
-            public static bool CompareByteArray(ReadOnlySpan<byte> a1, ReadOnlySpan<byte> a2)
+            private static bool CompareByteArray(ReadOnlySpan<byte> a1, ReadOnlySpan<byte> a2)
             {
                 return a1.SequenceEqual(a2);
             }
