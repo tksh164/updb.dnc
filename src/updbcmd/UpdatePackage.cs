@@ -17,7 +17,7 @@ namespace updbcmd
         {
             if (Directory.Exists(updatePackageFilePath))
             {
-                throw new ArgumentException(string.Format("The path '{0}' does not the file path. It is the path to the directory.", updatePackageFilePath), nameof(updatePackageFilePath));
+                throw new ArgumentException(string.Format(@"The path ""{0}"" was not a file path. It was a path to a directory.", updatePackageFilePath), nameof(updatePackageFilePath));
             }
 
             var updatePackageType = UpdatePackageTypeDetector.Detect(updatePackageFilePath);
@@ -26,7 +26,7 @@ namespace updbcmd
             }
             else
             {
-                throw new UnknownUpdatePackageTypeException("The package type of the file is unknown.", updatePackageFilePath);
+                throw new UnknownUpdatePackageTypeException(@"The package type of the file was unknown.", updatePackageFilePath);
             }
 
             return new UpdatePackage();
