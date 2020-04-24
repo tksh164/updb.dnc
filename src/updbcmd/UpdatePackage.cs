@@ -5,6 +5,12 @@ using System.IO;
 
 namespace updbcmd
 {
+    internal enum UpdatePackageType
+    {
+        Unknown,   // Unknown update package type
+        MSCF,      // .msu, .cab
+    };
+
     internal class UpdatePackage
     {
         public static UpdatePackage RetrieveData(string updatePackageFilePath)
@@ -15,14 +21,16 @@ namespace updbcmd
             }
 
             var updatePackageType = UpdatePackageTypeDetector.Detect(updatePackageFilePath);
+            if (updatePackageType == UpdatePackageType.MSCF)
+            {
+            }
+            else
+            {
+                throw new UnknownUpdatePackageTypeException("The package type of the file is unknown.", updatePackageFilePath);
+            }
+
             return new UpdatePackage();
         }
-
-        internal enum UpdatePackageType
-        {
-            Unknown,   // Unknown update package type
-            MSCF,      // .msu, .cab
-        };
 
         internal class UpdatePackageTypeDetector
         {
@@ -53,6 +61,30 @@ namespace updbcmd
             {
                 return a1.SequenceEqual(a2);
             }
+        }
+    }
+
+    internal class UnknownUpdatePackageTypeException : Exception
+    {
+        public string UpdatePackageFilePath { get; private set; }
+
+        public UnknownUpdatePackageTypeException()
+        {}
+
+        public UnknownUpdatePackageTypeException(string message) : base(message)
+        {}
+
+        public UnknownUpdatePackageTypeException(string message, string updatePackageFilePath) : base(message)
+        {
+            UpdatePackageFilePath = updatePackageFilePath;
+        }
+
+        public UnknownUpdatePackageTypeException(string message, Exception innerException) : base(message, innerException)
+        {}
+
+        public UnknownUpdatePackageTypeException(string message, string updatePackageFilePath, Exception innerException) : base(message, innerException)
+        {
+            UpdatePackageFilePath = updatePackageFilePath;
         }
     }
 }
