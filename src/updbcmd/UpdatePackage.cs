@@ -9,6 +9,11 @@ namespace updbcmd
     {
         public static UpdatePackage RetrieveData(string updatePackageFilePath)
         {
+            if (Directory.Exists(updatePackageFilePath))
+            {
+                throw new ArgumentException(string.Format("The path '{0}' does not the file path. It is the path to the directory.", updatePackageFilePath), nameof(updatePackageFilePath));
+            }
+
             var updatePackageType = UpdatePackageTypeDetector.Detect(updatePackageFilePath);
             return new UpdatePackage();
         }
