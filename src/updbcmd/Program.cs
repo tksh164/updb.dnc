@@ -11,7 +11,7 @@ namespace updbcmd
             {
                 var filePath = Console.ReadLine().Trim(trimChars);
                 if (string.IsNullOrWhiteSpace(filePath)) break;
-                Console.WriteLine(filePath);
+                var updatePackage = UpdatePackage.RetrieveData(filePath);
             }
         }
     }
