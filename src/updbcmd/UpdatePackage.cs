@@ -5,12 +5,6 @@ using System.IO;
 
 namespace updbcmd
 {
-    internal enum UpdatePackageType
-    {
-        Unknown,   // Unknown update package type
-        MSCF,      // .msu, .cab
-    };
-
     internal class UpdatePackage
     {
         public static UpdatePackage RetrieveData(string updatePackageFilePath)
@@ -63,6 +57,12 @@ namespace updbcmd
             }
         }
     }
+
+    internal enum UpdatePackageType
+    {
+        Unknown,   // Unknown update package type
+        MSCF,      // .msu, .cab
+    };
 
     internal class UnknownUpdatePackageTypeException : Exception
     {
