@@ -6,7 +6,13 @@ namespace updbcmd
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            char[] trimChars = new char[] { ' ', '\t', '"' };
+            while (true)
+            {
+                var filePath = Console.ReadLine().Trim(trimChars);
+                if (string.IsNullOrWhiteSpace(filePath)) break;
+                Console.WriteLine(filePath);
+            }
         }
     }
 }
