@@ -87,7 +87,7 @@ namespace updbcmd
             var filePath = Directory.EnumerateFiles(workFolderPath, fileNamePattern, SearchOption.TopDirectoryOnly).FirstOrDefault();
             if (filePath == null)
             {
-                throw new FileNotFoundWithinUpdatePackageException(Path.Combine(workFolderPath, fileNamePattern));
+                throw new UpdatePackageCriticalFileNotFoundException(Path.Combine(workFolderPath, fileNamePattern));
             }
             return filePath;
         }
@@ -256,16 +256,16 @@ namespace updbcmd
         }
     }
 
-    internal class FileNotFoundWithinUpdatePackageException : Exception
+    internal class UpdatePackageCriticalFileNotFoundException : Exception
     {
         public string FilePath { get; protected set; }
 
-        public FileNotFoundWithinUpdatePackageException(string filePath)
+        public UpdatePackageCriticalFileNotFoundException(string filePath)
             : this(filePath, null)
         { }
 
-        public FileNotFoundWithinUpdatePackageException(string filePath, Exception innerException)
-            : base(string.Format(@"The file ""{0}"" did not exist in the update package file.", filePath), innerException)
+        public UpdatePackageCriticalFileNotFoundException(string filePath, Exception innerException)
+            : base(string.Format(@"The critical file ""{0}"" did not exist in the update package file.", filePath), innerException)
         {
             FilePath = filePath;
         }
