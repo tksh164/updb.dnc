@@ -111,9 +111,9 @@ namespace updbcmd
         private static string GetXmlAttributeValue(XmlDocument rootXmlDoc, XmlNamespaceManager nsManager, string nodeXPath, string attributeName)
         {
             var node = rootXmlDoc.SelectSingleNode(nodeXPath, nsManager);
-            if (node == null) throw new PackageXmlNodeNotFoundException(nodeXPath);
+            if (node == null) throw new UpdatePackageXmlNodeNotFoundException(nodeXPath);
             var attributeValue = node?.Attributes[attributeName]?.Value;
-            if (attributeValue == null) throw new PackageXmlAttributeNotFoundException(nodeXPath, attributeName);
+            if (attributeValue == null) throw new UpdatePackageXmlAttributeNotFoundException(nodeXPath, attributeName);
             return attributeValue;
         }
 
@@ -271,31 +271,31 @@ namespace updbcmd
         }
     }
 
-    internal class PackageXmlNodeNotFoundException : Exception
+    internal class UpdatePackageXmlNodeNotFoundException : Exception
     {
         public string XPath { get; protected set; }
 
-        public PackageXmlNodeNotFoundException(string xpath)
+        public UpdatePackageXmlNodeNotFoundException(string xpath)
             : this(xpath, null)
         { }
 
-        public PackageXmlNodeNotFoundException(string xpath, Exception innerException)
+        public UpdatePackageXmlNodeNotFoundException(string xpath, Exception innerException)
             : base(string.Format(@"The ""{0}"" node did not found on the XML document.", xpath), innerException)
         {
             XPath = xpath;
         }
     }
 
-    internal class PackageXmlAttributeNotFoundException : Exception
+    internal class UpdatePackageXmlAttributeNotFoundException : Exception
     {
         public string XPath { get; protected set; }
         public string Attribute { get; protected set; }
 
-        public PackageXmlAttributeNotFoundException(string xpath, string attribute)
+        public UpdatePackageXmlAttributeNotFoundException(string xpath, string attribute)
             : this(xpath, attribute, null)
         { }
 
-        public PackageXmlAttributeNotFoundException(string xpath, string attribute, Exception innerException)
+        public UpdatePackageXmlAttributeNotFoundException(string xpath, string attribute, Exception innerException)
             : base(string.Format(@"The ""{0}"" attribute did not found on the ""{1}"" node.", attribute, xpath), innerException)
         {
             XPath = xpath;
