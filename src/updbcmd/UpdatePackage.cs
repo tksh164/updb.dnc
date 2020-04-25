@@ -5,7 +5,6 @@ using System.IO;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml;
-using System.Reflection.Metadata.Ecma335;
 
 namespace updbcmd
 {
