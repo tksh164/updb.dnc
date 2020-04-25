@@ -20,7 +20,7 @@ namespace updbcmd
             }
             else
             {
-                throw new UnknownUpdatePackageTypeException(@"The package type of the file was unknown.", updatePackageFilePath);
+                throw new UnknownUpdatePackageTypeException(updatePackageFilePath);
             }
 
             return new UpdatePackage();
@@ -68,18 +68,12 @@ namespace updbcmd
     {
         public string UpdatePackageFilePath { get; private set; }
 
-        public UnknownUpdatePackageTypeException(string message) : base(message)
-        {}
+        public UnknownUpdatePackageTypeException(string updatePackageFilePath)
+            : this(updatePackageFilePath, null)
+        { }
 
-        public UnknownUpdatePackageTypeException(string message, string updatePackageFilePath) : base(message)
-        {
-            UpdatePackageFilePath = updatePackageFilePath;
-        }
-
-        public UnknownUpdatePackageTypeException(string message, Exception innerException) : base(message, innerException)
-        {}
-
-        public UnknownUpdatePackageTypeException(string message, string updatePackageFilePath, Exception innerException) : base(message, innerException)
+        public UnknownUpdatePackageTypeException(string updatePackageFilePath, Exception innerException)
+            : base(string.Format(@"The package type of ""{0}"" was unknown.", updatePackageFilePath), innerException)
         {
             UpdatePackageFilePath = updatePackageFilePath;
         }
