@@ -12,26 +12,25 @@ namespace updbcmd
     internal class UpdatePackage
     {
         public string UpdatePackageFielPath { get; protected set; }
-        public byte[] UpdatePackageFielHash { get; protected set; }
+        public byte[] FielHash { get; protected set; }
         public string PackageName { get; protected set; }
         public string PackageVersion { get; protected set; }
         public string PackageLanguage { get; protected set; }
         public string PackageProcessorArchitecture { get; protected set; }
-        public string InnerCabFileLocation { get; protected set; }
-        public string ApplicabilityInfo { get; protected set; }
-        public string AppliesTo { get; protected set; }
-        public string BuildDate { get; protected set; }
-        public string Company { get; protected set; }
-        public string FileVersion { get; protected set; }
-        public string InstallationType { get; protected set; }
-        public string InstallerEngine { get; protected set; }
-        public string InstallerVersion { get; protected set; }
-        public string KBArticleNumber { get; protected set; }
-        public string Language { get; protected set; }
-        public string PackageType { get; protected set; }
-        public string ProcessorArchitecture { get; protected set; }
-        public string ProductName { get; protected set; }
-        public string SupportLink { get; protected set; }
+        public string ApplicabilityInfoProperty { get; protected set; }
+        public string AppliesToProperty { get; protected set; }
+        public string BuildDateProperty { get; protected set; }
+        public string CompanyProperty { get; protected set; }
+        public string FileVersionProperty { get; protected set; }
+        public string InstallationTypeProperty { get; protected set; }
+        public string InstallerEngineProperty { get; protected set; }
+        public string InstallerVersionProperty { get; protected set; }
+        public string KBArticleNumberProperty { get; protected set; }
+        public string LanguageProperty { get; protected set; }
+        public string PackageTypeProperty { get; protected set; }
+        public string ProcessorArchitectureProperty { get; protected set; }
+        public string ProductNameProperty { get; protected set; }
+        public string SupportLinkProperty { get; protected set; }
 
         public static UpdatePackage RetrieveData(string updatePackageFilePath)
         {
@@ -67,20 +66,20 @@ namespace updbcmd
 
                         var packagePropertyFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*-pkgProperties.txt");
                         var packageMetadataFromPropertyFile = GetPackageMetadataFromPropertyFile(packagePropertyFilePath);
-                        result.ApplicabilityInfo = packageMetadataFromPropertyFile.ApplicabilityInfo;
-                        result.AppliesTo = packageMetadataFromPropertyFile.AppliesTo;
-                        result.BuildDate = packageMetadataFromPropertyFile.BuildDate;
-                        result.Company = packageMetadataFromPropertyFile.Company;
-                        result.FileVersion = packageMetadataFromPropertyFile.FileVersion;
-                        result.InstallationType = packageMetadataFromPropertyFile.InstallationType;
-                        result.InstallerEngine = packageMetadataFromPropertyFile.InstallerEngine;
-                        result.InstallerVersion = packageMetadataFromPropertyFile.InstallerVersion;
-                        result.KBArticleNumber = packageMetadataFromPropertyFile.KBArticleNumber;
-                        result.Language = packageMetadataFromPropertyFile.Language;
-                        result.PackageType = packageMetadataFromPropertyFile.PackageType;
-                        result.ProcessorArchitecture = packageMetadataFromPropertyFile.ProcessorArchitecture;
-                        result.ProductName = packageMetadataFromPropertyFile.ProductName;
-                        result.SupportLink = packageMetadataFromPropertyFile.SupportLink;
+                        result.ApplicabilityInfoProperty = packageMetadataFromPropertyFile.ApplicabilityInfo;
+                        result.AppliesToProperty = packageMetadataFromPropertyFile.AppliesTo;
+                        result.BuildDateProperty = packageMetadataFromPropertyFile.BuildDate;
+                        result.CompanyProperty = packageMetadataFromPropertyFile.Company;
+                        result.FileVersionProperty = packageMetadataFromPropertyFile.FileVersion;
+                        result.InstallationTypeProperty = packageMetadataFromPropertyFile.InstallationType;
+                        result.InstallerEngineProperty = packageMetadataFromPropertyFile.InstallerEngine;
+                        result.InstallerVersionProperty = packageMetadataFromPropertyFile.InstallerVersion;
+                        result.KBArticleNumberProperty = packageMetadataFromPropertyFile.KBArticleNumber;
+                        result.LanguageProperty = packageMetadataFromPropertyFile.Language;
+                        result.PackageTypeProperty = packageMetadataFromPropertyFile.PackageType;
+                        result.ProcessorArchitectureProperty = packageMetadataFromPropertyFile.ProcessorArchitecture;
+                        result.ProductNameProperty = packageMetadataFromPropertyFile.ProductName;
+                        result.SupportLinkProperty = packageMetadataFromPropertyFile.SupportLink;
 
                         var innerCabFilePath = GetInnerCabFilePath(packageMetadataFromXmlFile.InnerCabFileLocation, workFolderPath);
                         var innerCabWorkFolderPath = CreateWorkFolder(workFolderPath);
@@ -88,7 +87,7 @@ namespace updbcmd
 
                         // TODO: Collect module file data.
 
-                        result.UpdatePackageFielHash = ComputeFileHash(updatePackageFilePath);
+                        result.FielHash = ComputeFileHash(updatePackageFilePath);
                     }
                     else
                     {
