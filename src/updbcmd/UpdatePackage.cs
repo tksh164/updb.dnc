@@ -153,46 +153,46 @@ namespace updbcmd
                 return a1.SequenceEqual(a2);
             }
         }
-    }
 
-    internal class MscfUpdatePackageExtractor
-    {
-        private const string CommandFilePath = @"C:\Windows\System32\expand.exe";
-
-        public static void Extract(string updatePackageFilePath, string destinationFolderPath)
+        internal class MscfUpdatePackageExtractor
         {
-            var commandParameter = string.Format(@"-f:* ""{0}"" ""{1}""", updatePackageFilePath, destinationFolderPath);
-            ExecuteExternalCommand(CommandFilePath, commandParameter);
-        }
+            private const string CommandFilePath = @"C:\Windows\System32\expand.exe";
 
-        private static void ExecuteExternalCommand(string commandFilePath, string commandParameter = null)
-        {
-            ProcessStartInfo processStartInfo = new ProcessStartInfo()
+            public static void Extract(string updatePackageFilePath, string destinationFolderPath)
             {
-                FileName = commandFilePath,
-                Arguments = commandParameter ?? string.Empty,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-            };
+                var commandParameter = string.Format(@"-f:* ""{0}"" ""{1}""", updatePackageFilePath, destinationFolderPath);
+                ExecuteExternalCommand(CommandFilePath, commandParameter);
+            }
 
-            using (Process process = Process.Start(processStartInfo))
+            private static void ExecuteExternalCommand(string commandFilePath, string commandParameter = null)
             {
-                StringBuilder outputData = new StringBuilder();
-                process.OutputDataReceived += (object sender, DataReceivedEventArgs e) => {
-                    outputData.Append(e.Data);
-                };
-                StringBuilder errorData = new StringBuilder();
-                process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => {
-                    errorData.Append(e.Data);
-                };
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-                process.WaitForExit();
-
-                if (process.ExitCode != 0)
+                ProcessStartInfo processStartInfo = new ProcessStartInfo()
                 {
-                    throw new ExternalCommandException(process, outputData.ToString(), errorData.ToString());
+                    FileName = commandFilePath,
+                    Arguments = commandParameter ?? string.Empty,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                };
+
+                using (Process process = Process.Start(processStartInfo))
+                {
+                    StringBuilder outputData = new StringBuilder();
+                    process.OutputDataReceived += (object sender, DataReceivedEventArgs e) => {
+                        outputData.Append(e.Data);
+                    };
+                    StringBuilder errorData = new StringBuilder();
+                    process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => {
+                        errorData.Append(e.Data);
+                    };
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+                    process.WaitForExit();
+
+                    if (process.ExitCode != 0)
+                    {
+                        throw new ExternalCommandException(process, outputData.ToString(), errorData.ToString());
+                    }
                 }
             }
         }
