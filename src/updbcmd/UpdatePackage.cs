@@ -30,7 +30,7 @@ namespace updbcmd
                     {
                         // .msu package
                         var packageXmlFilePath = GetPackageXmlFilePath(workFolderPath);
-                        GetPackageMetadataFromXmlFile(packageXmlFilePath);
+                        var packageMetadataFromXml = GetPackageMetadataFromXmlFile(packageXmlFilePath);
                     }
                     else
                     {
@@ -92,19 +92,20 @@ namespace updbcmd
             return packageXmlFilePath;
         }
 
-        private static void GetPackageMetadataFromXmlFile(string packageXmlFilePath)
+        private static PackageMetadataFromXml GetPackageMetadataFromXmlFile(string packageXmlFilePath)
         {
             var rootXmlDoc = new XmlDocument();
             rootXmlDoc.Load(packageXmlFilePath);
-
             var nsManager = new XmlNamespaceManager(rootXmlDoc.NameTable);
             nsManager.AddNamespace("u", "urn:schemas-microsoft-com:unattend");
-
-            var packageName = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "name");
-            var packageVersion = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "version");
-            var packageLanguage = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "language");
-            var packageProcessorArchitecture = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "processorArchitecture");
-            var innerCabFileLocation = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:source", "location");
+            return new PackageMetadataFromXml()
+            {
+                PackageName = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "name"),
+                PackageVersion = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "version"),
+                PackageLanguage = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "language"),
+                PackageProcessorArchitecture = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "processorArchitecture"),
+                InnerCabFileLocation = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:source", "location"),
+            };
         }
 
         private static string GetXmlAttributeValue(XmlDocument rootXmlDoc, XmlNamespaceManager nsManager, string nodeXPath, string attributeName)
@@ -114,6 +115,15 @@ namespace updbcmd
             var attributeValue = node?.Attributes[attributeName]?.Value;
             if (attributeValue == null) throw new PackageXmlAttributeNotFoundException(nodeXPath, attributeName);
             return attributeValue;
+        }
+
+        internal class PackageMetadataFromXml
+        {
+            public string PackageName { get; set; }
+            public string PackageVersion { get; set; }
+            public string PackageLanguage { get; set; }
+            public string PackageProcessorArchitecture { get; set; }
+            public string InnerCabFileLocation { get; set; }
         }
 
         internal enum UpdatePackageType
