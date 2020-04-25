@@ -29,7 +29,7 @@ namespace updbcmd
                     if (VerifyWsusScanCabExistence(workFolderPath))
                     {
                         // .msu package
-                        var packageXmlFilePath = GetPackageXmlFilePath(workFolderPath);
+                        var packageXmlFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*.xml");
                         var packageMetadataFromXml = GetPackageMetadataFromXmlFile(packageXmlFilePath);
                     }
                     else
@@ -82,14 +82,14 @@ namespace updbcmd
             return wsusScanCabFilePath != null;
         }
 
-        private static string GetPackageXmlFilePath(string workFolderPath)
+        private static string GetFilePathDirectlyUnderFolder(string workFolderPath, string fileNamePattern)
         {
-            var packageXmlFilePath = Directory.EnumerateFiles(workFolderPath, "*.xml", SearchOption.TopDirectoryOnly).FirstOrDefault();
-            if (packageXmlFilePath == null)
+            var filePath = Directory.EnumerateFiles(workFolderPath, fileNamePattern, SearchOption.TopDirectoryOnly).FirstOrDefault();
+            if (filePath == null)
             {
-                throw new PackageXmlFileNotFoundException(Path.Combine(workFolderPath, "*.xml"));
+                throw new FileNotFoundWithinUpdatePackageException(Path.Combine(workFolderPath, fileNamePattern));
             }
-            return packageXmlFilePath;
+            return filePath;
         }
 
         private static PackageMetadataFromXml GetPackageMetadataFromXmlFile(string packageXmlFilePath)
@@ -256,18 +256,18 @@ namespace updbcmd
         }
     }
 
-    internal class PackageXmlFileNotFoundException : Exception
+    internal class FileNotFoundWithinUpdatePackageException : Exception
     {
-        public string XmlFilePath { get; protected set; }
+        public string FilePath { get; protected set; }
 
-        public PackageXmlFileNotFoundException(string xmlFilePath)
-            : this(xmlFilePath, null)
+        public FileNotFoundWithinUpdatePackageException(string filePath)
+            : this(filePath, null)
         { }
 
-        public PackageXmlFileNotFoundException(string xmlFilePath, Exception innerException)
-            : base(string.Format(@"The package XML file ""{0}"" did not exist in the update package file.", xmlFilePath), innerException)
+        public FileNotFoundWithinUpdatePackageException(string filePath, Exception innerException)
+            : base(string.Format(@"The file ""{0}"" did not exist in the update package file.", filePath), innerException)
         {
-            XmlFilePath = xmlFilePath;
+            FilePath = filePath;
         }
     }
 
