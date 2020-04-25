@@ -83,6 +83,8 @@ namespace updbcmd
                         var innerCabFilePath = GetInnerCabFilePath(packageMetadataFromXmlFile.InnerCabFileLocation, workFolderPath);
                         var innerCabWorkFolderPath = CreateWorkFolder(workFolderPath);
                         MscfUpdatePackageExtractor.Extract(innerCabFilePath, innerCabWorkFolderPath);
+
+                        // TODO: Collect module file data.
                     }
                     else
                     {
