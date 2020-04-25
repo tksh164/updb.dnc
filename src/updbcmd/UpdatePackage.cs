@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Linq;
+using System.Xml;
 
 namespace updbcmd
 {
@@ -29,6 +30,7 @@ namespace updbcmd
                     {
                         // .msu package
                         var packageXmlFilePath = GetPackageXmlFilePath(workFolderPath);
+                        GetPackageMetadata(packageXmlFilePath);
                     }
                     else
                     {
@@ -88,6 +90,37 @@ namespace updbcmd
                 throw new PackageXmlFileNotFoundException(Path.Combine(workFolderPath, "*.xml"));
             }
             return packageXmlFilePath;
+        }
+
+        private static void GetPackageMetadata(string packageXmlFilePath)
+        {
+            var rootXmlDoc = new XmlDocument();
+            rootXmlDoc.Load(packageXmlFilePath);
+
+            var nsManager = new XmlNamespaceManager(rootXmlDoc.NameTable);
+            nsManager.AddNamespace("u", "urn:schemas-microsoft-com:unattend");
+
+            // The package name.
+
+            // The package version.
+
+            // The package language.
+
+            // The package processor architecture.
+
+            // The inner CAB file path.
+            GetInnerCabFileLocation(rootXmlDoc, nsManager);
+        }
+
+        private static string GetInnerCabFileLocation(XmlDocument rootXmlDoc, XmlNamespaceManager nsManager)
+        {
+            const string nodeXPath = "/u:unattend/u:servicing/u:package/u:source";
+            const string attributeName = "location";
+            var sourceNode = rootXmlDoc.SelectSingleNode(nodeXPath, nsManager);
+            if (sourceNode == null) throw new PackageXmlNodeNotFoundException(nodeXPath);
+            var location = sourceNode?.Attributes[attributeName]?.Value;
+            if (location == null) throw new PackageXmlAttributeNotFoundException(nodeXPath, attributeName);
+            return location;
         }
 
         internal class UpdatePackageTypeDetector
@@ -232,6 +265,38 @@ namespace updbcmd
             : base(string.Format(@"The package XML file ""{0}"" did not exist in the update package file.", xmlFilePath), innerException)
         {
             XmlFilePath = xmlFilePath;
+        }
+    }
+
+    internal class PackageXmlNodeNotFoundException : Exception
+    {
+        public string XPath { get; protected set; }
+
+        public PackageXmlNodeNotFoundException(string xpath)
+            : this(xpath, null)
+        { }
+
+        public PackageXmlNodeNotFoundException(string xpath, Exception innerException)
+            : base(string.Format(@"The ""{0}"" node did not found on the XML document.", xpath), innerException)
+        {
+            XPath = xpath;
+        }
+    }
+
+    internal class PackageXmlAttributeNotFoundException : Exception
+    {
+        public string XPath { get; protected set; }
+        public string Attribute { get; protected set; }
+
+        public PackageXmlAttributeNotFoundException(string xpath, string attribute)
+            : this(xpath, attribute, null)
+        { }
+
+        public PackageXmlAttributeNotFoundException(string xpath, string attribute, Exception innerException)
+            : base(string.Format(@"The ""{0}"" attribute did not found on the ""{1}"" node.", attribute, xpath), innerException)
+        {
+            XPath = xpath;
+            Attribute = attribute;
         }
     }
 }
