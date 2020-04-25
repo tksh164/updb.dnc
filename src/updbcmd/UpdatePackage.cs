@@ -5,12 +5,14 @@ using System.IO;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml;
+using System.Security.Cryptography;
 
 namespace updbcmd
 {
     internal class UpdatePackage
     {
         public string UpdatePackageFielPath { get; protected set; }
+        public byte[] UpdatePackageFielHash { get; protected set; }
         public string PackageName { get; protected set; }
         public string PackageVersion { get; protected set; }
         public string PackageLanguage { get; protected set; }
@@ -85,6 +87,8 @@ namespace updbcmd
                         MscfUpdatePackageExtractor.Extract(innerCabFilePath, innerCabWorkFolderPath);
 
                         // TODO: Collect module file data.
+
+                        result.UpdatePackageFielHash = ComputeFileHash(updatePackageFilePath);
                     }
                     else
                     {
@@ -246,6 +250,15 @@ namespace updbcmd
                     nameof(innerCabFileLocation));
             }
             return innerCabFileLocation.Replace(placeholderKeyword, workFolderPath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static byte[] ComputeFileHash(string filePath)
+        {
+            using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                SHA1CryptoServiceProvider sha1Provider = new SHA1CryptoServiceProvider();
+                return sha1Provider.ComputeHash(stream);
+            }
         }
 
         internal enum UpdatePackageType
