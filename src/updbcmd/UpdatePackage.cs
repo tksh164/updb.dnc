@@ -5,6 +5,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml;
+using System.Reflection.Metadata.Ecma335;
 
 namespace updbcmd
 {
@@ -30,7 +31,9 @@ namespace updbcmd
                     {
                         // .msu package
                         var packageXmlFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*.xml");
-                        var packageMetadataFromXml = GetPackageMetadataFromXmlFile(packageXmlFilePath);
+                        var packageMetadataFromXmlFile = GetPackageMetadataFromXmlFile(packageXmlFilePath);
+                        var packagePropertyFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*-pkgProperties.txt");
+                        var packageMetadataFromPropertyFile = GetPackageMetadataFromPropertyFile(packagePropertyFilePath);
                     }
                     else
                     {
@@ -92,13 +95,13 @@ namespace updbcmd
             return filePath;
         }
 
-        private static PackageMetadataFromXml GetPackageMetadataFromXmlFile(string packageXmlFilePath)
+        private static PackageMetadataFromXmlFile GetPackageMetadataFromXmlFile(string packageXmlFilePath)
         {
             var rootXmlDoc = new XmlDocument();
             rootXmlDoc.Load(packageXmlFilePath);
             var nsManager = new XmlNamespaceManager(rootXmlDoc.NameTable);
             nsManager.AddNamespace("u", "urn:schemas-microsoft-com:unattend");
-            return new PackageMetadataFromXml()
+            return new PackageMetadataFromXmlFile()
             {
                 PackageName = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "name"),
                 PackageVersion = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "version"),
@@ -117,13 +120,69 @@ namespace updbcmd
             return attributeValue;
         }
 
-        internal class PackageMetadataFromXml
+        internal class PackageMetadataFromXmlFile
         {
             public string PackageName { get; set; }
             public string PackageVersion { get; set; }
             public string PackageLanguage { get; set; }
             public string PackageProcessorArchitecture { get; set; }
             public string InnerCabFileLocation { get; set; }
+        }
+
+        private static PackageMetadataFromPropertyFile GetPackageMetadataFromPropertyFile(string packagePropertyFilePath)
+        {
+            var lines = File.ReadAllLines(packagePropertyFilePath, Encoding.UTF8);
+            var properties = new Dictionary<string, string>(lines.Length);
+            foreach (var line in lines)
+            {
+                (var key, var value) = ExtractKeyValue(line);
+                properties.Add(key, value);
+            }
+            return new PackageMetadataFromPropertyFile()
+            {
+                ApplicabilityInfo = properties["ApplicabilityInfo"],
+                AppliesTo = properties["Applies to"],
+                BuildDate = properties["Build Date"],
+                Company = properties["Company"],
+                FileVersion = properties["File Version"],
+                InstallationType = properties["Installation Type"],
+                InstallerEngine = properties["Installer Engine"],
+                InstallerVersion = properties["Installer Version"],
+                KBArticleNumber = properties["KB Article Number"],
+                Language = properties["Language"],
+                PackageType = properties["Package Type"],
+                ProcessorArchitecture = properties["Processor Architecture"],
+                ProductName = properties["Product Name"],
+                SupportLink = properties["Support Link"],
+            };
+        }
+
+        private static (string Key, string Value) ExtractKeyValue(string line)
+        {
+            var parts = line.Split("=", 2, StringSplitOptions.None);
+            if (parts.Length < 2) throw new ArgumentOutOfRangeException(nameof(line), line, "Unexpected line format detected as package property file line.");
+            var trimChars = new char[] { ' ', '"' };
+            var key = parts[0].Trim(trimChars);
+            var value = parts[1].Trim(trimChars);
+            return (key, value);
+        }
+
+        internal class PackageMetadataFromPropertyFile
+        {
+            public string ApplicabilityInfo { get; set; }
+            public string AppliesTo { get; set; }
+            public string BuildDate { get; set; }
+            public string Company { get; set; }
+            public string FileVersion { get; set; }
+            public string InstallationType { get; set; }
+            public string InstallerEngine { get; set; }
+            public string InstallerVersion { get; set; }
+            public string KBArticleNumber { get; set; }
+            public string Language { get; set; }
+            public string PackageType { get; set; }
+            public string ProcessorArchitecture { get; set; }
+            public string ProductName { get; set; }
+            public string SupportLink { get; set; }
         }
 
         internal enum UpdatePackageType
