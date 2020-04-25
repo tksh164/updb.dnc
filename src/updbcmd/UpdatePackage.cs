@@ -22,6 +22,11 @@ namespace updbcmd
                 try
                 {
                     workFolderPath = CreateWorkFolder();
+                    MscfUpdatePackageExtractor.Extract(updatePackageFilePath, workFolderPath);
+                }
+                catch (Exception e)
+                {
+                    throw new MscfUpdatePackageDataRetrieveException(updatePackageFilePath, e);
                 }
                 finally
                 {
@@ -89,6 +94,49 @@ namespace updbcmd
         }
     }
 
+    internal class MscfUpdatePackageExtractor
+    {
+        private const string CommandFilePath = @"C:\Windows\System32\expand.exe";
+
+        public static void Extract(string updatePackageFilePath, string destinationFolderPath)
+        {
+            var commandParameter = string.Format(@"-f:* ""{0}"" ""{1}""", updatePackageFilePath, destinationFolderPath);
+            ExecuteExternalCommand(CommandFilePath, commandParameter);
+        }
+
+        private static void ExecuteExternalCommand(string commandFilePath, string commandParameter = null)
+        {
+            ProcessStartInfo processStartInfo = new ProcessStartInfo()
+            {
+                FileName = commandFilePath,
+                Arguments = commandParameter ?? string.Empty,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            };
+
+            using (Process process = Process.Start(processStartInfo))
+            {
+                StringBuilder outputData = new StringBuilder();
+                process.OutputDataReceived += (object sender, DataReceivedEventArgs e) => {
+                    outputData.Append(e.Data);
+                };
+                StringBuilder errorData = new StringBuilder();
+                process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => {
+                    errorData.Append(e.Data);
+                };
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                {
+                    throw new ExternalCommandException(process, outputData.ToString(), errorData.ToString());
+                }
+            }
+        }
+    }
+
     internal enum UpdatePackageType
     {
         Unknown,   // Unknown update package type
@@ -105,6 +153,40 @@ namespace updbcmd
 
         public UnknownUpdatePackageTypeException(string updatePackageFilePath, Exception innerException)
             : base(string.Format(@"The package type of ""{0}"" was unknown.", updatePackageFilePath), innerException)
+        {
+            UpdatePackageFilePath = updatePackageFilePath;
+        }
+    }
+
+    internal class ExternalCommandException : Exception
+    {
+        public Process Process { get; private set; }
+        public string OutputData { get; private set; }
+        public string ErrorData { get; private set; }
+
+        public ExternalCommandException(Process process, string outputData, string errorData)
+            : this(process, outputData, errorData, null)
+        { }
+
+        public ExternalCommandException(Process process, string outputData, string errorData, Exception innerException)
+            : base(string.Format(@"The command-line ""{0} {1}"" was abnormally exit with {2}", process.StartInfo.FileName, process.StartInfo.Arguments, process.ExitCode), innerException)
+        {
+            Process = process;
+            OutputData = outputData;
+            ErrorData = errorData;
+        }
+    }
+
+    internal class MscfUpdatePackageDataRetrieveException : Exception
+    {
+        public string UpdatePackageFilePath { get; private set; }
+
+        public MscfUpdatePackageDataRetrieveException(string updatePackageFilePath)
+            : this(updatePackageFilePath, null)
+        { }
+
+        public MscfUpdatePackageDataRetrieveException(string updatePackageFilePath, Exception innerException)
+            : base(string.Format(@"Could not retrieve the data from update package ""{0}"".", updatePackageFilePath), innerException)
         {
             UpdatePackageFilePath = updatePackageFilePath;
         }
