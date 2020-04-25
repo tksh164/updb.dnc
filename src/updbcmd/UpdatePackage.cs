@@ -10,12 +10,38 @@ namespace updbcmd
 {
     internal class UpdatePackage
     {
+        public string UpdatePackageFielPath { get; protected set; }
+        public string PackageName { get; protected set; }
+        public string PackageVersion { get; protected set; }
+        public string PackageLanguage { get; protected set; }
+        public string PackageProcessorArchitecture { get; protected set; }
+        public string InnerCabFileLocation { get; protected set; }
+        public string ApplicabilityInfo { get; protected set; }
+        public string AppliesTo { get; protected set; }
+        public string BuildDate { get; protected set; }
+        public string Company { get; protected set; }
+        public string FileVersion { get; protected set; }
+        public string InstallationType { get; protected set; }
+        public string InstallerEngine { get; protected set; }
+        public string InstallerVersion { get; protected set; }
+        public string KBArticleNumber { get; protected set; }
+        public string Language { get; protected set; }
+        public string PackageType { get; protected set; }
+        public string ProcessorArchitecture { get; protected set; }
+        public string ProductName { get; protected set; }
+        public string SupportLink { get; protected set; }
+
         public static UpdatePackage RetrieveData(string updatePackageFilePath)
         {
             if (Directory.Exists(updatePackageFilePath))
             {
                 throw new ArgumentException(string.Format(@"The path ""{0}"" was not a file path. It was a path to a directory.", updatePackageFilePath), nameof(updatePackageFilePath));
             }
+
+            var result = new UpdatePackage()
+            {
+                UpdatePackageFielPath = updatePackageFilePath,
+            };
 
             var updatePackageType = UpdatePackageTypeDetector.Detect(updatePackageFilePath);
             if (updatePackageType == UpdatePackageType.MSCF)
@@ -29,11 +55,30 @@ namespace updbcmd
                     if (VerifyWsusScanCabExistence(workFolderPath))
                     {
                         // .msu package
+
                         var packageXmlFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*.xml");
                         var packageMetadataFromXmlFile = GetPackageMetadataFromXmlFile(packageXmlFilePath);
+                        result.PackageName = packageMetadataFromXmlFile.PackageName;
+                        result.PackageVersion = packageMetadataFromXmlFile.PackageVersion;
+                        result.PackageLanguage = packageMetadataFromXmlFile.PackageLanguage;
+                        result.PackageProcessorArchitecture = packageMetadataFromXmlFile.PackageProcessorArchitecture;
 
                         var packagePropertyFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*-pkgProperties.txt");
                         var packageMetadataFromPropertyFile = GetPackageMetadataFromPropertyFile(packagePropertyFilePath);
+                        result.ApplicabilityInfo = packageMetadataFromPropertyFile.ApplicabilityInfo;
+                        result.AppliesTo = packageMetadataFromPropertyFile.AppliesTo;
+                        result.BuildDate = packageMetadataFromPropertyFile.BuildDate;
+                        result.Company = packageMetadataFromPropertyFile.Company;
+                        result.FileVersion = packageMetadataFromPropertyFile.FileVersion;
+                        result.InstallationType = packageMetadataFromPropertyFile.InstallationType;
+                        result.InstallerEngine = packageMetadataFromPropertyFile.InstallerEngine;
+                        result.InstallerVersion = packageMetadataFromPropertyFile.InstallerVersion;
+                        result.KBArticleNumber = packageMetadataFromPropertyFile.KBArticleNumber;
+                        result.Language = packageMetadataFromPropertyFile.Language;
+                        result.PackageType = packageMetadataFromPropertyFile.PackageType;
+                        result.ProcessorArchitecture = packageMetadataFromPropertyFile.ProcessorArchitecture;
+                        result.ProductName = packageMetadataFromPropertyFile.ProductName;
+                        result.SupportLink = packageMetadataFromPropertyFile.SupportLink;
 
                         var innerCabFilePath = GetInnerCabFilePath(packageMetadataFromXmlFile.InnerCabFileLocation, workFolderPath);
                         var innerCabWorkFolderPath = CreateWorkFolder(workFolderPath);
@@ -62,7 +107,7 @@ namespace updbcmd
                 throw new UnknownUpdatePackageTypeException(updatePackageFilePath);
             }
 
-            return new UpdatePackage();
+            return result;
         }
 
         private static string CreateWorkFolder()
