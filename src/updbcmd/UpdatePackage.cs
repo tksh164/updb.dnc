@@ -31,8 +31,13 @@ namespace updbcmd
                         // .msu package
                         var packageXmlFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*.xml");
                         var packageMetadataFromXmlFile = GetPackageMetadataFromXmlFile(packageXmlFilePath);
+
                         var packagePropertyFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*-pkgProperties.txt");
                         var packageMetadataFromPropertyFile = GetPackageMetadataFromPropertyFile(packagePropertyFilePath);
+
+                        var innerCabFilePath = GetInnerCabFilePath(packageMetadataFromXmlFile.InnerCabFileLocation, workFolderPath);
+                        var innerCabWorkFolderPath = CreateWorkFolder(workFolderPath);
+                        MscfUpdatePackageExtractor.Extract(innerCabFilePath, innerCabWorkFolderPath);
                     }
                     else
                     {
@@ -182,6 +187,18 @@ namespace updbcmd
             public string ProcessorArchitecture { get; set; }
             public string ProductName { get; set; }
             public string SupportLink { get; set; }
+        }
+
+        private static string GetInnerCabFilePath(string innerCabFileLocation, string workFolderPath)
+        {
+            const string placeholderKeyword = "%ConfigSetRoot%";
+            if (!innerCabFileLocation.Contains(placeholderKeyword, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException(
+                    string.Format(@"The inner CAB file location did not contain the placeholder keyword {0}. The inner CAB file location was ""{1}"".", placeholderKeyword, innerCabFileLocation),
+                    nameof(innerCabFileLocation));
+            }
+            return innerCabFileLocation.Replace(placeholderKeyword, workFolderPath, StringComparison.OrdinalIgnoreCase);
         }
 
         internal enum UpdatePackageType
