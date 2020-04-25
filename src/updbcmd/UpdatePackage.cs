@@ -100,27 +100,20 @@ namespace updbcmd
             var nsManager = new XmlNamespaceManager(rootXmlDoc.NameTable);
             nsManager.AddNamespace("u", "urn:schemas-microsoft-com:unattend");
 
-            // The package name.
-
-            // The package version.
-
-            // The package language.
-
-            // The package processor architecture.
-
-            // The inner CAB file path.
-            var innerCabFileLocation = GetInnerCabFileLocation(rootXmlDoc, nsManager);
+            var packageName = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "name");
+            var packageVersion = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "version");
+            var packageLanguage = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "language");
+            var packageProcessorArchitecture = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:assemblyIdentity", "processorArchitecture");
+            var innerCabFileLocation = GetXmlAttributeValue(rootXmlDoc, nsManager, "/u:unattend/u:servicing/u:package/u:source", "location");
         }
 
-        private static string GetInnerCabFileLocation(XmlDocument rootXmlDoc, XmlNamespaceManager nsManager)
+        private static string GetXmlAttributeValue(XmlDocument rootXmlDoc, XmlNamespaceManager nsManager, string nodeXPath, string attributeName)
         {
-            const string nodeXPath = "/u:unattend/u:servicing/u:package/u:source";
-            const string attributeName = "location";
-            var sourceNode = rootXmlDoc.SelectSingleNode(nodeXPath, nsManager);
-            if (sourceNode == null) throw new PackageXmlNodeNotFoundException(nodeXPath);
-            var location = sourceNode?.Attributes[attributeName]?.Value;
-            if (location == null) throw new PackageXmlAttributeNotFoundException(nodeXPath, attributeName);
-            return location;
+            var node = rootXmlDoc.SelectSingleNode(nodeXPath, nsManager);
+            if (node == null) throw new PackageXmlNodeNotFoundException(nodeXPath);
+            var attributeValue = node?.Attributes[attributeName]?.Value;
+            if (attributeValue == null) throw new PackageXmlAttributeNotFoundException(nodeXPath, attributeName);
+            return attributeValue;
         }
 
         internal enum UpdatePackageType
