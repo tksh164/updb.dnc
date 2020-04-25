@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using System.Linq;
 
 namespace updbcmd
 {
@@ -23,6 +24,16 @@ namespace updbcmd
                 {
                     workFolderPath = CreateWorkFolder();
                     MscfUpdatePackageExtractor.Extract(updatePackageFilePath, workFolderPath);
+
+                    if (VerifyWsusScanCabExistence(workFolderPath))
+                    {
+                        // .msu package
+                    }
+                    else
+                    {
+                        // .cab package
+                        throw new NotImplementedException(string.Format(@"The CAB file type update package does not support currently. The package file path was ""{0}"".", updatePackageFilePath));
+                    }
                 }
                 catch (Exception e)
                 {
@@ -60,6 +71,12 @@ namespace updbcmd
             Directory.CreateDirectory(workFolderPath);
             Debug.WriteLine("WorkFolderPath: {0}", workFolderPath);
             return workFolderPath;
+        }
+
+        private static bool VerifyWsusScanCabExistence(string workFolderPath)
+        {
+            var wsusScanCabFilePath = Directory.EnumerateFiles(workFolderPath, "WSUSSCAN.cab", SearchOption.TopDirectoryOnly).FirstOrDefault();
+            return wsusScanCabFilePath != null;
         }
 
         internal class UpdatePackageTypeDetector
