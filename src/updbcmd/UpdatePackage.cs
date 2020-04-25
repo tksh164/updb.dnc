@@ -85,8 +85,7 @@ namespace updbcmd
             var packageXmlFilePath = Directory.EnumerateFiles(workFolderPath, "*.xml", SearchOption.TopDirectoryOnly).FirstOrDefault();
             if (packageXmlFilePath == null)
             {
-                var xmlFilePath = Path.Combine(workFolderPath, "*.xml");
-                throw new FileNotFoundException(string.Format(@"The package XML file ""{0}"" did not exist in the update package file.", xmlFilePath), xmlFilePath);
+                throw new PackageXmlFileNotFoundException(Path.Combine(workFolderPath, "*.xml"));
             }
             return packageXmlFilePath;
         }
@@ -218,6 +217,21 @@ namespace updbcmd
             : base(string.Format(@"Could not retrieve the data from update package ""{0}"".", updatePackageFilePath), innerException)
         {
             UpdatePackageFilePath = updatePackageFilePath;
+        }
+    }
+
+    internal class PackageXmlFileNotFoundException : Exception
+    {
+        public string XmlFilePath { get; protected set; }
+
+        public PackageXmlFileNotFoundException(string xmlFilePath)
+            : this(xmlFilePath, null)
+        { }
+
+        public PackageXmlFileNotFoundException(string xmlFilePath, Exception innerException)
+            : base(string.Format(@"The package XML file ""{0}"" did not exist in the update package file.", xmlFilePath), innerException)
+        {
+            XmlFilePath = xmlFilePath;
         }
     }
 }
