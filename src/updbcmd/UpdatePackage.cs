@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace updbcmd
 {
@@ -17,6 +18,18 @@ namespace updbcmd
             var updatePackageType = UpdatePackageTypeDetector.Detect(updatePackageFilePath);
             if (updatePackageType == UpdatePackageType.MSCF)
             {
+                string workFolderPath = null;
+                try
+                {
+                    workFolderPath = CreateWorkFolder();
+                }
+                finally
+                {
+                    if (workFolderPath != null && Directory.Exists(workFolderPath))
+                    {
+                        Directory.Delete(workFolderPath, true);
+                    }
+                }
             }
             else
             {
@@ -24,6 +37,24 @@ namespace updbcmd
             }
 
             return new UpdatePackage();
+        }
+
+        private static string CreateWorkFolder()
+        {
+            return CreateWorkFolder(Path.GetTempPath());
+        }
+
+        private static string CreateWorkFolder(string baseFolderPath)
+        {
+            string workFolderPath;
+            while (true)
+            {
+                workFolderPath = Path.Combine(baseFolderPath, Path.GetRandomFileName());
+                if (!Directory.Exists(workFolderPath)) break;
+            }
+            Directory.CreateDirectory(workFolderPath);
+            Debug.WriteLine("WorkFolderPath: {0}", workFolderPath);
+            return workFolderPath;
         }
 
         internal class UpdatePackageTypeDetector
