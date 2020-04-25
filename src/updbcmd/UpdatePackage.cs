@@ -28,6 +28,7 @@ namespace updbcmd
                     if (VerifyWsusScanCabExistence(workFolderPath))
                     {
                         // .msu package
+                        var packageXmlFilePath = GetPackageXmlFilePath(workFolderPath);
                     }
                     else
                     {
@@ -77,6 +78,17 @@ namespace updbcmd
         {
             var wsusScanCabFilePath = Directory.EnumerateFiles(workFolderPath, "WSUSSCAN.cab", SearchOption.TopDirectoryOnly).FirstOrDefault();
             return wsusScanCabFilePath != null;
+        }
+
+        private static string GetPackageXmlFilePath(string workFolderPath)
+        {
+            var packageXmlFilePath = Directory.EnumerateFiles(workFolderPath, "*.xml", SearchOption.TopDirectoryOnly).FirstOrDefault();
+            if (packageXmlFilePath == null)
+            {
+                var xmlFilePath = Path.Combine(workFolderPath, "*.xml");
+                throw new FileNotFoundException(string.Format(@"The package XML file ""{0}"" did not exist in the update package file.", xmlFilePath), xmlFilePath);
+            }
+            return packageXmlFilePath;
         }
 
         internal class UpdatePackageTypeDetector
