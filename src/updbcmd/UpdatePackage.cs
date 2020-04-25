@@ -30,7 +30,7 @@ namespace updbcmd
                     {
                         // .msu package
                         var packageXmlFilePath = GetPackageXmlFilePath(workFolderPath);
-                        GetPackageMetadata(packageXmlFilePath);
+                        GetPackageMetadataFromXmlFile(packageXmlFilePath);
                     }
                     else
                     {
@@ -92,7 +92,7 @@ namespace updbcmd
             return packageXmlFilePath;
         }
 
-        private static void GetPackageMetadata(string packageXmlFilePath)
+        private static void GetPackageMetadataFromXmlFile(string packageXmlFilePath)
         {
             var rootXmlDoc = new XmlDocument();
             rootXmlDoc.Load(packageXmlFilePath);
@@ -109,7 +109,7 @@ namespace updbcmd
             // The package processor architecture.
 
             // The inner CAB file path.
-            GetInnerCabFileLocation(rootXmlDoc, nsManager);
+            var innerCabFileLocation = GetInnerCabFileLocation(rootXmlDoc, nsManager);
         }
 
         private static string GetInnerCabFileLocation(XmlDocument rootXmlDoc, XmlNamespaceManager nsManager)
