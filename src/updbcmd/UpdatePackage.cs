@@ -75,7 +75,7 @@ namespace updbcmd
             string workFolderPath;
             while (true)
             {
-                workFolderPath = Path.Combine(baseFolderPath, Path.GetRandomFileName());
+                workFolderPath = Path.Combine(baseFolderPath, Path.GetRandomFileName().Substring(0, 3));
                 if (!Directory.Exists(workFolderPath)) break;
             }
             Directory.CreateDirectory(workFolderPath);
