@@ -123,6 +123,12 @@ namespace updbcmd
             return location;
         }
 
+        internal enum UpdatePackageType
+        {
+            Unknown,   // Unknown update package type
+            MSCF,      // .msu, .cab
+        };
+
         internal class UpdatePackageTypeDetector
         {
             private static readonly byte[] MscfSignature = new byte[] { 0x4D, 0x53, 0x43, 0x46 };  // M, S, C, F
@@ -197,12 +203,6 @@ namespace updbcmd
             }
         }
     }
-
-    internal enum UpdatePackageType
-    {
-        Unknown,   // Unknown update package type
-        MSCF,      // .msu, .cab
-    };
 
     internal class UnknownUpdatePackageTypeException : Exception
     {
