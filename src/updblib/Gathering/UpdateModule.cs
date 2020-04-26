@@ -16,6 +16,11 @@ namespace updblib.Gathering
     {
         public static UpdateModule RetrieveData(string updateModuleFilePath)
         {
+            if (Directory.Exists(updateModuleFilePath))
+            {
+                throw new ArgumentException(string.Format(@"The path ""{0}"" was not a file path. It was a path to a directory.", updateModuleFilePath), nameof(updateModuleFilePath));
+            }
+
             var updateModuleFileType = UpdateModuleFileTypeDetector.Detect(updateModuleFilePath);
             if (updateModuleFileType == UpdateModuleFileType.Executable)
             {
