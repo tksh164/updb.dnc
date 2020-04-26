@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace updblib.Gathering
 {
@@ -15,6 +16,19 @@ namespace updblib.Gathering
     public class UpdateModule
     {
         public string UpdateModuleFilePath { get; protected set; }
+        public long FileSize { get; protected set; }
+        public string OriginalFileName { get; protected set; }
+        public string FileVersion { get; protected set; }
+        public DateTime LastModifiedDateTimeUtc { get; protected set; }
+        public string CompanyName { get; protected set; }
+        public string FileDescription { get; protected set; }
+        public string FileName { get; protected set; }
+        public string InternalName { get; protected set; }
+        public string Language { get; protected set; }
+        public string LegalCopyright { get; protected set; }
+        public string LegalTrademarks { get; protected set; }
+        public string ProductName { get; protected set; }
+        public string ProductVersion { get; protected set; }
 
         public static UpdateModule RetrieveData(string updateModuleFilePath)
         {
@@ -31,7 +45,21 @@ namespace updblib.Gathering
             var updateModuleFileType = UpdateModuleFileTypeDetector.Detect(updateModuleFilePath);
             if (updateModuleFileType == UpdateModuleFileType.Executable)
             {
-                throw new NotImplementedException(string.Format(@"Not suppoerted module file type ""{0}""", updateModuleFilePath));
+                var fileInfo = new FileInfo(updateModuleFilePath);
+                var fileVersionInfo = FileVersionInfo.GetVersionInfo(updateModuleFilePath);
+                result.FileSize = fileInfo.Length;
+                result.OriginalFileName = fileVersionInfo.OriginalFilename;
+                result.FileVersion = fileVersionInfo.FileVersion;
+                result.LastModifiedDateTimeUtc = fileInfo.LastWriteTimeUtc;
+                result.CompanyName = fileVersionInfo.CompanyName;
+                result.FileDescription = fileVersionInfo.FileDescription;
+                result.FileName = Path.GetFileName(fileVersionInfo.FileName);
+                result.InternalName = fileVersionInfo.InternalName;
+                result.Language = fileVersionInfo.Language;
+                result.LegalCopyright = fileVersionInfo.LegalCopyright;
+                result.LegalTrademarks = fileVersionInfo.LegalTrademarks;
+                result.ProductName = fileVersionInfo.ProductName;
+                result.ProductVersion = fileVersionInfo.ProductVersion;
             }
             else if (updateModuleFileType == UpdateModuleFileType.Xml)
             {
