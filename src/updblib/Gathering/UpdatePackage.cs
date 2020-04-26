@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace UPDB.Gathering
 {
-    internal class UpdatePackage
+    public class UpdatePackage
     {
         public string UpdatePackageFielPath { get; protected set; }
         public byte[] FielHash { get; protected set; }
