@@ -48,18 +48,18 @@ namespace updblib.Gathering
                 var fileInfo = new FileInfo(updateModuleFilePath);
                 var fileVersionInfo = FileVersionInfo.GetVersionInfo(updateModuleFilePath);
                 result.FileSize = fileInfo.Length;
-                result.OriginalFileName = fileVersionInfo.OriginalFilename;
-                result.FileVersion = fileVersionInfo.FileVersion;
+                result.OriginalFileName = fileVersionInfo.OriginalFilename.Trim();
+                result.FileVersion = fileVersionInfo.FileVersion.Trim();
                 result.LastModifiedDateTimeUtc = fileInfo.LastWriteTimeUtc;
-                result.CompanyName = fileVersionInfo.CompanyName;
-                result.FileDescription = fileVersionInfo.FileDescription;
-                result.FileName = Path.GetFileName(fileVersionInfo.FileName);
-                result.InternalName = fileVersionInfo.InternalName;
-                result.Language = fileVersionInfo.Language;
-                result.LegalCopyright = fileVersionInfo.LegalCopyright;
-                result.LegalTrademarks = fileVersionInfo.LegalTrademarks;
-                result.ProductName = fileVersionInfo.ProductName;
-                result.ProductVersion = fileVersionInfo.ProductVersion;
+                result.CompanyName = fileVersionInfo.CompanyName.Trim();
+                result.FileDescription = fileVersionInfo.FileDescription.Trim();
+                result.FileName = Path.GetFileName(fileVersionInfo.FileName.Trim());
+                result.InternalName = fileVersionInfo.InternalName.Trim();
+                result.Language = fileVersionInfo.Language.Trim();
+                result.LegalCopyright = fileVersionInfo.LegalCopyright.Trim();
+                result.LegalTrademarks = fileVersionInfo.LegalTrademarks.Trim();
+                result.ProductName = fileVersionInfo.ProductName.Trim();
+                result.ProductVersion = fileVersionInfo.ProductVersion.Trim();
             }
             else if (updateModuleFileType == UpdateModuleFileType.Xml)
             {
