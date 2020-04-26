@@ -39,21 +39,20 @@ namespace updblib.Gathering
             }
 
             var updateModuleFileType = UpdateModuleFileTypeDetector.Detect(updateModuleFilePath);
-
+            var fileInfo = new FileInfo(updateModuleFilePath);
             var result = new UpdateModule()
             {
                 UpdateModuleFilePath = updateModuleFilePath,
                 UpdateModuleFileType = updateModuleFileType,
+                FileSize = fileInfo.Length,
+                LastModifiedDateTimeUtc = fileInfo.LastWriteTimeUtc,
             };
 
             if (updateModuleFileType == UpdateModuleFileType.Executable)
             {
-                var fileInfo = new FileInfo(updateModuleFilePath);
                 var fileVersionInfo = FileVersionInfo.GetVersionInfo(updateModuleFilePath);
-                result.FileSize = fileInfo.Length;
                 result.OriginalFileName = fileVersionInfo.OriginalFilename.Trim();
                 result.FileVersion = fileVersionInfo.FileVersion.Trim();
-                result.LastModifiedDateTimeUtc = fileInfo.LastWriteTimeUtc;
                 result.CompanyName = fileVersionInfo.CompanyName.Trim();
                 result.FileDescription = fileVersionInfo.FileDescription.Trim();
                 result.FileName = Path.GetFileName(fileVersionInfo.FileName.Trim());
