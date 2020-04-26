@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace updbcmd
+namespace UPDB.Gathering
 {
-    internal class UnknownUpdatePackageTypeException : Exception
+    public class UnknownUpdatePackageTypeException : Exception
     {
         public string UpdatePackageFilePath { get; private set; }
 
@@ -18,7 +18,7 @@ namespace updbcmd
         }
     }
 
-    internal class ExternalCommandException : Exception
+    public class ExternalCommandException : Exception
     {
         public Process Process { get; private set; }
         public string OutputData { get; private set; }
@@ -37,7 +37,7 @@ namespace updbcmd
         }
     }
 
-    internal class MscfUpdatePackageDataRetrieveException : Exception
+    public class MscfUpdatePackageDataRetrieveException : Exception
     {
         public string UpdatePackageFilePath { get; private set; }
 
@@ -52,7 +52,7 @@ namespace updbcmd
         }
     }
 
-    internal class UpdatePackageCriticalFileNotFoundException : Exception
+    public class UpdatePackageCriticalFileNotFoundException : Exception
     {
         public string FilePath { get; protected set; }
 
@@ -67,7 +67,7 @@ namespace updbcmd
         }
     }
 
-    internal class UpdatePackageXmlNodeNotFoundException : Exception
+    public class UpdatePackageXmlNodeNotFoundException : Exception
     {
         public string XPath { get; protected set; }
 
@@ -82,7 +82,7 @@ namespace updbcmd
         }
     }
 
-    internal class UpdatePackageXmlAttributeNotFoundException : Exception
+    public class UpdatePackageXmlAttributeNotFoundException : Exception
     {
         public string XPath { get; protected set; }
         public string Attribute { get; protected set; }

@@ -7,9 +7,9 @@ using System.Linq;
 using System.Xml;
 using System.Security.Cryptography;
 
-namespace updbcmd
+namespace UPDB.Gathering
 {
-    internal class UpdatePackage
+    public class UpdatePackage
     {
         public string UpdatePackageFielPath { get; protected set; }
         public byte[] FielHash { get; protected set; }
