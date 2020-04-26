@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace updbcmd
+namespace UPDB.Gathering
 {
     internal class UnknownUpdatePackageTypeException : Exception
     {

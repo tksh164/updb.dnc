@@ -7,7 +7,7 @@ using System.Linq;
 using System.Xml;
 using System.Security.Cryptography;
 
-namespace updbcmd
+namespace UPDB.Gathering
 {
     internal class UpdatePackage
     {
