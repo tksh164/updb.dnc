@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "updbcmd", "updbcmd\updbcmd.csproj", "{543783FB-8E72-4465-91F4-04BD3167CB24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "updbcmd", "updbcmd\updbcmd.csproj", "{543783FB-8E72-4465-91F4-04BD3167CB24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "updblib", "updblib\updblib.csproj", "{95CC44AD-E4E3-4D8F-81AB-F475D2391634}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{543783FB-8E72-4465-91F4-04BD3167CB24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{543783FB-8E72-4465-91F4-04BD3167CB24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{543783FB-8E72-4465-91F4-04BD3167CB24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95CC44AD-E4E3-4D8F-81AB-F475D2391634}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95CC44AD-E4E3-4D8F-81AB-F475D2391634}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95CC44AD-E4E3-4D8F-81AB-F475D2391634}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95CC44AD-E4E3-4D8F-81AB-F475D2391634}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
