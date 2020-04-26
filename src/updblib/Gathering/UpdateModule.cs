@@ -16,6 +16,7 @@ namespace updblib.Gathering
     public class UpdateModule
     {
         public string UpdateModuleFilePath { get; protected set; }
+        public UpdateModuleFileType UpdateModuleFileType { get; protected set; }
         public long FileSize { get; protected set; }
         public string OriginalFileName { get; protected set; }
         public string FileVersion { get; protected set; }
@@ -37,12 +38,14 @@ namespace updblib.Gathering
                 throw new ArgumentException(string.Format(@"The path ""{0}"" was not a file path. It was a path to a directory.", updateModuleFilePath), nameof(updateModuleFilePath));
             }
 
+            var updateModuleFileType = UpdateModuleFileTypeDetector.Detect(updateModuleFilePath);
+
             var result = new UpdateModule()
             {
                 UpdateModuleFilePath = updateModuleFilePath,
+                UpdateModuleFileType = updateModuleFileType,
             };
 
-            var updateModuleFileType = UpdateModuleFileTypeDetector.Detect(updateModuleFilePath);
             if (updateModuleFileType == UpdateModuleFileType.Executable)
             {
                 var fileInfo = new FileInfo(updateModuleFilePath);
