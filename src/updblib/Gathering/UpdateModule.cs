@@ -40,16 +40,8 @@ namespace UPDB.Gathering
                 throw new ArgumentException(string.Format(@"The path ""{0}"" was not a file path. It was a path to a directory.", updateModuleFilePath), nameof(updateModuleFilePath));
             }
 
+            var result = new UpdateModule();
             var updateModuleFileType = UpdateModuleFileTypeDetector.Detect(updateModuleFilePath);
-            var fileInfo = new FileInfo(updateModuleFilePath);
-            var result = new UpdateModule()
-            {
-                UpdateModuleFilePath = updateModuleFilePath,
-                UpdateModuleFileType = updateModuleFileType,
-                FileSize = fileInfo.Length,
-                LastModifiedDateTimeUtc = fileInfo.LastWriteTimeUtc,
-            };
-
             if (updateModuleFileType == UpdateModuleFileType.Executable)
             {
                 var fileVersionInfo = FileVersionInfo.GetVersionInfo(updateModuleFilePath);
@@ -74,7 +66,13 @@ namespace UPDB.Gathering
                 throw new NotImplementedException(string.Format(@"Not suppoerted module file type ""{0}""", updateModuleFilePath));
             }
 
+            result.UpdateModuleFilePath = updateModuleFilePath;
             result.FielHash = FileHashHelper.ComputeFileHash(updateModuleFilePath);
+
+            var fileInfo = new FileInfo(updateModuleFilePath);
+            result.UpdateModuleFileType = updateModuleFileType;
+            result.FileSize = fileInfo.Length;
+            result.LastModifiedDateTimeUtc = fileInfo.LastWriteTimeUtc;
 
             return result;
         }
