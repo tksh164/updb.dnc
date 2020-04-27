@@ -10,10 +10,17 @@ using UPDB.Gathering.Helpers;
 
 namespace UPDB.Gathering
 {
+    public enum UpdatePackageType
+    {
+        Unknown,   // Unknown update package type
+        MSCF,      // .msu, .cab
+    };
+
     public class UpdatePackage
     {
         public string UpdatePackageFielPath { get; protected set; }
         public byte[] FielHash { get; protected set; }
+        public UpdatePackageType UpdatePackageType { get; protected set; }
         public string PackageName { get; protected set; }
         public string PackageVersion { get; protected set; }
         public string PackageLanguage { get; protected set; }
@@ -109,6 +116,7 @@ namespace UPDB.Gathering
 
             package.UpdatePackageFielPath = updatePackageFilePath;
             package.FielHash = FileHashHelper.ComputeFileHash(updatePackageFilePath);
+            package.UpdatePackageType = updatePackageType;
 
             return package;
         }
@@ -260,12 +268,6 @@ namespace UPDB.Gathering
             }
             return innerCabFileLocation.Replace(placeholderKeyword, workFolderPath, StringComparison.OrdinalIgnoreCase);
         }
-
-        internal enum UpdatePackageType
-        {
-            Unknown,   // Unknown update package type
-            MSCF,      // .msu, .cab
-        };
 
         internal class MscfUpdatePackageExtractor
         {
