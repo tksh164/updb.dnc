@@ -66,13 +66,13 @@ namespace UPDB.Gathering
                 throw new NotImplementedException(string.Format(@"Not suppoerted module file type ""{0}""", updateModuleFilePath));
             }
 
-            module.UpdateModuleFilePath = updateModuleFilePath;
-            module.FielHash = FileHashHelper.ComputeFileHash(updateModuleFilePath);
-
             var fileInfo = new FileInfo(updateModuleFilePath);
             module.UpdateModuleFileType = updateModuleFileType;
             module.FileSize = fileInfo.Length;
             module.LastModifiedDateTimeUtc = fileInfo.LastWriteTimeUtc;
+
+            module.UpdateModuleFilePath = updateModuleFilePath;
+            module.FielHash = FileHashHelper.ComputeFileHash(updateModuleFilePath);
 
             return module;
         }
