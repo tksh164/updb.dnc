@@ -40,11 +40,7 @@ namespace UPDB.Gathering
                 throw new ArgumentException(string.Format(@"The path ""{0}"" was not a file path. It was a path to a directory.", updatePackageFilePath), nameof(updatePackageFilePath));
             }
 
-            var result = new UpdatePackage()
-            {
-                UpdatePackageFielPath = updatePackageFilePath,
-            };
-
+            var result = new UpdatePackage();
             var updatePackageType = UpdatePackageTypeDetector.Detect(updatePackageFilePath);
             if (updatePackageType == UpdatePackageType.MSCF)
             {
@@ -87,8 +83,6 @@ namespace UPDB.Gathering
                         MscfUpdatePackageExtractor.Extract(innerCabFilePath, innerCabWorkFolderPath);
 
                         // TODO: Collect module file data.
-
-                        result.FielHash = FileHashHelper.ComputeFileHash(updatePackageFilePath);
                     }
                     else
                     {
@@ -112,6 +106,9 @@ namespace UPDB.Gathering
             {
                 throw new UnknownUpdatePackageTypeException(updatePackageFilePath);
             }
+
+            result.UpdatePackageFielPath = updatePackageFilePath;
+            result.FielHash = FileHashHelper.ComputeFileHash(updatePackageFilePath);
 
             return result;
         }
