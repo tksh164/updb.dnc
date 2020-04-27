@@ -40,22 +40,22 @@ namespace UPDB.Gathering
                 throw new ArgumentException(string.Format(@"The path ""{0}"" was not a file path. It was a path to a directory.", updateModuleFilePath), nameof(updateModuleFilePath));
             }
 
-            var result = new UpdateModule();
+            var module = new UpdateModule();
             var updateModuleFileType = UpdateModuleFileTypeDetector.Detect(updateModuleFilePath);
             if (updateModuleFileType == UpdateModuleFileType.Executable)
             {
                 var fileVersionInfo = FileVersionInfo.GetVersionInfo(updateModuleFilePath);
-                result.FileName = Path.GetFileName(fileVersionInfo.FileName.Trim());
-                result.OriginalFileName = fileVersionInfo.OriginalFilename.Trim();
-                result.InternalName = fileVersionInfo.InternalName.Trim();
-                result.FileVersion = fileVersionInfo.FileVersion.Trim();
-                result.FileDescription = fileVersionInfo.FileDescription.Trim();
-                result.ProductName = fileVersionInfo.ProductName.Trim();
-                result.ProductVersion = fileVersionInfo.ProductVersion.Trim();
-                result.Language = fileVersionInfo.Language.Trim();
-                result.CompanyName = fileVersionInfo.CompanyName.Trim();
-                result.LegalCopyright = fileVersionInfo.LegalCopyright.Trim();
-                result.LegalTrademarks = fileVersionInfo.LegalTrademarks.Trim();
+                module.FileName = Path.GetFileName(fileVersionInfo.FileName.Trim());
+                module.OriginalFileName = fileVersionInfo.OriginalFilename.Trim();
+                module.InternalName = fileVersionInfo.InternalName.Trim();
+                module.FileVersion = fileVersionInfo.FileVersion.Trim();
+                module.FileDescription = fileVersionInfo.FileDescription.Trim();
+                module.ProductName = fileVersionInfo.ProductName.Trim();
+                module.ProductVersion = fileVersionInfo.ProductVersion.Trim();
+                module.Language = fileVersionInfo.Language.Trim();
+                module.CompanyName = fileVersionInfo.CompanyName.Trim();
+                module.LegalCopyright = fileVersionInfo.LegalCopyright.Trim();
+                module.LegalTrademarks = fileVersionInfo.LegalTrademarks.Trim();
             }
             else if (updateModuleFileType == UpdateModuleFileType.Xml)
             {
@@ -66,15 +66,15 @@ namespace UPDB.Gathering
                 throw new NotImplementedException(string.Format(@"Not suppoerted module file type ""{0}""", updateModuleFilePath));
             }
 
-            result.UpdateModuleFilePath = updateModuleFilePath;
-            result.FielHash = FileHashHelper.ComputeFileHash(updateModuleFilePath);
+            module.UpdateModuleFilePath = updateModuleFilePath;
+            module.FielHash = FileHashHelper.ComputeFileHash(updateModuleFilePath);
 
             var fileInfo = new FileInfo(updateModuleFilePath);
-            result.UpdateModuleFileType = updateModuleFileType;
-            result.FileSize = fileInfo.Length;
-            result.LastModifiedDateTimeUtc = fileInfo.LastWriteTimeUtc;
+            module.UpdateModuleFileType = updateModuleFileType;
+            module.FileSize = fileInfo.Length;
+            module.LastModifiedDateTimeUtc = fileInfo.LastWriteTimeUtc;
 
-            return result;
+            return module;
         }
 
         internal class UpdateModuleFileTypeDetector

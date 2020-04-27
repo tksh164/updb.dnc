@@ -40,7 +40,7 @@ namespace UPDB.Gathering
                 throw new ArgumentException(string.Format(@"The path ""{0}"" was not a file path. It was a path to a directory.", updatePackageFilePath), nameof(updatePackageFilePath));
             }
 
-            var result = new UpdatePackage();
+            var package = new UpdatePackage();
             var updatePackageType = UpdatePackageTypeDetector.Detect(updatePackageFilePath);
             if (updatePackageType == UpdatePackageType.MSCF)
             {
@@ -56,27 +56,27 @@ namespace UPDB.Gathering
 
                         var packageXmlFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*.xml");
                         var packageMetadataFromXmlFile = GetPackageMetadataFromXmlFile(packageXmlFilePath);
-                        result.PackageName = packageMetadataFromXmlFile.PackageName;
-                        result.PackageVersion = packageMetadataFromXmlFile.PackageVersion;
-                        result.PackageLanguage = packageMetadataFromXmlFile.PackageLanguage;
-                        result.PackageProcessorArchitecture = packageMetadataFromXmlFile.PackageProcessorArchitecture;
+                        package.PackageName = packageMetadataFromXmlFile.PackageName;
+                        package.PackageVersion = packageMetadataFromXmlFile.PackageVersion;
+                        package.PackageLanguage = packageMetadataFromXmlFile.PackageLanguage;
+                        package.PackageProcessorArchitecture = packageMetadataFromXmlFile.PackageProcessorArchitecture;
 
                         var packagePropertyFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*-pkgProperties.txt");
                         var packageMetadataFromPropertyFile = GetPackageMetadataFromPropertyFile(packagePropertyFilePath);
-                        result.ApplicabilityInfoProperty = packageMetadataFromPropertyFile.ApplicabilityInfo;
-                        result.AppliesToProperty = packageMetadataFromPropertyFile.AppliesTo;
-                        result.BuildDateProperty = packageMetadataFromPropertyFile.BuildDate;
-                        result.CompanyProperty = packageMetadataFromPropertyFile.Company;
-                        result.FileVersionProperty = packageMetadataFromPropertyFile.FileVersion;
-                        result.InstallationTypeProperty = packageMetadataFromPropertyFile.InstallationType;
-                        result.InstallerEngineProperty = packageMetadataFromPropertyFile.InstallerEngine;
-                        result.InstallerVersionProperty = packageMetadataFromPropertyFile.InstallerVersion;
-                        result.KBArticleNumberProperty = packageMetadataFromPropertyFile.KBArticleNumber;
-                        result.LanguageProperty = packageMetadataFromPropertyFile.Language;
-                        result.PackageTypeProperty = packageMetadataFromPropertyFile.PackageType;
-                        result.ProcessorArchitectureProperty = packageMetadataFromPropertyFile.ProcessorArchitecture;
-                        result.ProductNameProperty = packageMetadataFromPropertyFile.ProductName;
-                        result.SupportLinkProperty = packageMetadataFromPropertyFile.SupportLink;
+                        package.ApplicabilityInfoProperty = packageMetadataFromPropertyFile.ApplicabilityInfo;
+                        package.AppliesToProperty = packageMetadataFromPropertyFile.AppliesTo;
+                        package.BuildDateProperty = packageMetadataFromPropertyFile.BuildDate;
+                        package.CompanyProperty = packageMetadataFromPropertyFile.Company;
+                        package.FileVersionProperty = packageMetadataFromPropertyFile.FileVersion;
+                        package.InstallationTypeProperty = packageMetadataFromPropertyFile.InstallationType;
+                        package.InstallerEngineProperty = packageMetadataFromPropertyFile.InstallerEngine;
+                        package.InstallerVersionProperty = packageMetadataFromPropertyFile.InstallerVersion;
+                        package.KBArticleNumberProperty = packageMetadataFromPropertyFile.KBArticleNumber;
+                        package.LanguageProperty = packageMetadataFromPropertyFile.Language;
+                        package.PackageTypeProperty = packageMetadataFromPropertyFile.PackageType;
+                        package.ProcessorArchitectureProperty = packageMetadataFromPropertyFile.ProcessorArchitecture;
+                        package.ProductNameProperty = packageMetadataFromPropertyFile.ProductName;
+                        package.SupportLinkProperty = packageMetadataFromPropertyFile.SupportLink;
 
                         var innerCabFilePath = GetInnerCabFilePath(packageMetadataFromXmlFile.InnerCabFileLocation, workFolderPath);
                         var innerCabWorkFolderPath = CreateWorkFolder(workFolderPath);
@@ -107,10 +107,10 @@ namespace UPDB.Gathering
                 throw new UnknownUpdatePackageTypeException(updatePackageFilePath);
             }
 
-            result.UpdatePackageFielPath = updatePackageFilePath;
-            result.FielHash = FileHashHelper.ComputeFileHash(updatePackageFilePath);
+            package.UpdatePackageFielPath = updatePackageFilePath;
+            package.FielHash = FileHashHelper.ComputeFileHash(updatePackageFilePath);
 
-            return result;
+            return package;
         }
 
         private static string CreateWorkFolder()
