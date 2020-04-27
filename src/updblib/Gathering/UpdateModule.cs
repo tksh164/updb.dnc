@@ -30,7 +30,7 @@ namespace UPDB.Gathering
             var module = new UpdateModule();
             try
             {
-                var updateModuleFileType = UpdateModuleFileTypeDetector.Detect(updateModuleFilePath);
+                var updateModuleFileType = DetectUpdateModuleFileType(updateModuleFilePath);
                 if (updateModuleFileType == UpdateModuleFileType.Executable)
                 {
                     module.ExecutableModuleProperties = new ExecutableUpdateModuleProperties(updateModuleFilePath);
@@ -60,24 +60,21 @@ namespace UPDB.Gathering
             return module;
         }
 
-        internal class UpdateModuleFileTypeDetector
-        {
-            private static readonly byte[] ExecutableFileSignature = new byte[] { 0x4d, 0x5a };  // M, Z
-            private static readonly byte[] XmlFileSignature = new byte[] { 0x3c, 0x3f, 0x78, 0x6d, 0x6c, 0x20 };  // <?xml
+        private static readonly byte[] ExecutableFileSignature = new byte[] { 0x4d, 0x5a };  // M, Z
+        private static readonly byte[] XmlFileSignature = new byte[] { 0x3c, 0x3f, 0x78, 0x6d, 0x6c, 0x20 };  // <?xml
 
-            public static UpdateModuleFileType Detect(string filePath)
+        private static UpdateModuleFileType DetectUpdateModuleFileType(string updateModuleFilePath)
+        {
+            var signature = FileSignatureHelper.ReadFileSignature(updateModuleFilePath);
+            if (FileSignatureHelper.CompareFileSignature(ExecutableFileSignature, signature.AsSpan(0, ExecutableFileSignature.Length)))
             {
-                var signature = FileSignatureHelper.ReadFileSignature(filePath);
-                if (FileSignatureHelper.CompareFileSignature(ExecutableFileSignature, signature.AsSpan(0, ExecutableFileSignature.Length)))
-                {
-                    return UpdateModuleFileType.Executable;
-                }
-                else if (FileSignatureHelper.CompareFileSignature(XmlFileSignature, signature.AsSpan(0, XmlFileSignature.Length)))
-                {
-                    return UpdateModuleFileType.Xml;
-                }
-                return UpdateModuleFileType.Other;
+                return UpdateModuleFileType.Executable;
             }
+            else if (FileSignatureHelper.CompareFileSignature(XmlFileSignature, signature.AsSpan(0, XmlFileSignature.Length)))
+            {
+                return UpdateModuleFileType.Xml;
+            }
+            return UpdateModuleFileType.Other;
         }
     }
 }

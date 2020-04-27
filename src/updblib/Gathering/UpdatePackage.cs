@@ -41,7 +41,7 @@ namespace UPDB.Gathering
             }
 
             var package = new UpdatePackage();
-            var updatePackageType = UpdatePackageTypeDetector.Detect(updatePackageFilePath);
+            var updatePackageType = DetectUpdatePackageType(updatePackageFilePath);
             if (updatePackageType == UpdatePackageType.MSCF)
             {
                 string workFolderPath = null;
@@ -111,6 +111,18 @@ namespace UPDB.Gathering
             package.FielHash = FileHashHelper.ComputeFileHash(updatePackageFilePath);
 
             return package;
+        }
+
+        private static readonly byte[] MscfSignature = new byte[] { 0x4D, 0x53, 0x43, 0x46 };  // M, S, C, F
+
+        private static UpdatePackageType DetectUpdatePackageType(string updatePackageFilePath)
+        {
+            var signature = FileSignatureHelper.ReadFileSignature(updatePackageFilePath);
+            if (FileSignatureHelper.CompareFileSignature(MscfSignature, signature.AsSpan(0, MscfSignature.Length)))
+            {
+                return UpdatePackageType.MSCF;
+            }
+            return UpdatePackageType.Unknown;
         }
 
         private static string CreateWorkFolder()
@@ -254,21 +266,6 @@ namespace UPDB.Gathering
             Unknown,   // Unknown update package type
             MSCF,      // .msu, .cab
         };
-
-        internal class UpdatePackageTypeDetector
-        {
-            private static readonly byte[] MscfSignature = new byte[] { 0x4D, 0x53, 0x43, 0x46 };  // M, S, C, F
-
-            public static UpdatePackageType Detect(string filePath)
-            {
-                var signature = FileSignatureHelper.ReadFileSignature(filePath);
-                if (FileSignatureHelper.CompareFileSignature(MscfSignature, signature.AsSpan(0, MscfSignature.Length)))
-                {
-                    return UpdatePackageType.MSCF;
-                }
-                return UpdatePackageType.Unknown;
-            }
-        }
 
         internal class MscfUpdatePackageExtractor
         {
