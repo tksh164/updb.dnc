@@ -20,6 +20,9 @@ namespace UPDB.Gathering
         public DateTime LastModifiedDateTimeUtc { get; protected set; }
         public ExecutableUpdateModuleProperties ExecutableModuleProperties { get; protected set; }
 
+        private UpdateModule()
+        { }
+
         public static UpdateModule RetrieveData(string updateModuleFilePath)
         {
             if (Directory.Exists(updateModuleFilePath))

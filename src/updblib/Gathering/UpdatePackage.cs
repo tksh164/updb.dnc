@@ -39,6 +39,9 @@ namespace UPDB.Gathering
         public string ProductNameProperty { get; protected set; }
         public string SupportLinkProperty { get; protected set; }
 
+        private UpdatePackage()
+        { }
+
         public static UpdatePackage RetrieveData(string updatePackageFilePath)
         {
             if (Directory.Exists(updatePackageFilePath))
