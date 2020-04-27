@@ -17,6 +17,7 @@ namespace UPDB.Gathering
     public class UpdateModule
     {
         public string UpdateModuleFilePath { get; protected set; }
+        public byte[] FielHash { get; protected set; }
         public UpdateModuleFileType UpdateModuleFileType { get; protected set; }
         public long FileSize { get; protected set; }
         public DateTime LastModifiedDateTimeUtc { get; protected set; }
@@ -72,6 +73,9 @@ namespace UPDB.Gathering
             {
                 throw new NotImplementedException(string.Format(@"Not suppoerted module file type ""{0}""", updateModuleFilePath));
             }
+
+            result.FielHash = FileHashHelper.ComputeFileHash(updateModuleFilePath);
+
             return result;
         }
 
