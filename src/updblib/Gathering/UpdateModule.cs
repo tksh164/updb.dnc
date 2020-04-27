@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
-using System.Diagnostics;
 using UPDB.Gathering.Helpers;
 
 namespace UPDB.Gathering
@@ -21,17 +18,7 @@ namespace UPDB.Gathering
         public UpdateModuleFileType UpdateModuleFileType { get; protected set; }
         public long FileSize { get; protected set; }
         public DateTime LastModifiedDateTimeUtc { get; protected set; }
-        public string FileName { get; protected set; }
-        public string OriginalFileName { get; protected set; }
-        public string InternalName { get; protected set; }
-        public string FileVersion { get; protected set; }
-        public string FileDescription { get; protected set; }
-        public string ProductName { get; protected set; }
-        public string ProductVersion { get; protected set; }
-        public string Language { get; protected set; }
-        public string CompanyName { get; protected set; }
-        public string LegalCopyright { get; protected set; }
-        public string LegalTrademarks { get; protected set; }
+        public ExecutableUpdateModuleProperties ExecutableModuleProperties { get; protected set; }
 
         public static UpdateModule RetrieveData(string updateModuleFilePath)
         {
@@ -46,18 +33,7 @@ namespace UPDB.Gathering
                 var updateModuleFileType = UpdateModuleFileTypeDetector.Detect(updateModuleFilePath);
                 if (updateModuleFileType == UpdateModuleFileType.Executable)
                 {
-                    var fileVersionInfo = FileVersionInfo.GetVersionInfo(updateModuleFilePath);
-                    module.FileName = Path.GetFileName(fileVersionInfo.FileName.Trim());
-                    module.OriginalFileName = fileVersionInfo.OriginalFilename.Trim();
-                    module.InternalName = fileVersionInfo.InternalName.Trim();
-                    module.FileVersion = fileVersionInfo.FileVersion.Trim();
-                    module.FileDescription = fileVersionInfo.FileDescription.Trim();
-                    module.ProductName = fileVersionInfo.ProductName.Trim();
-                    module.ProductVersion = fileVersionInfo.ProductVersion.Trim();
-                    module.Language = fileVersionInfo.Language.Trim();
-                    module.CompanyName = fileVersionInfo.CompanyName.Trim();
-                    module.LegalCopyright = fileVersionInfo.LegalCopyright.Trim();
-                    module.LegalTrademarks = fileVersionInfo.LegalTrademarks.Trim();
+                    module.ExecutableModuleProperties = new ExecutableUpdateModuleProperties(updateModuleFilePath);
                 }
                 else if (updateModuleFileType == UpdateModuleFileType.Xml)
                 {
