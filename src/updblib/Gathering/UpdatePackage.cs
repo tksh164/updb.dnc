@@ -120,7 +120,7 @@ namespace UPDB.Gathering
             return package;
         }
 
-        private static readonly byte[] MscfSignature = new byte[] { 0x4D, 0x53, 0x43, 0x46 };  // M, S, C, F
+        private static readonly byte[] MscfSignature = new byte[] { 0x4d, 0x53, 0x43, 0x46 };  // M, S, C, F
 
         private static UpdatePackageType DetectUpdatePackageType(string updatePackageFilePath)
         {
