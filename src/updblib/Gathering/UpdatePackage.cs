@@ -18,8 +18,8 @@ namespace UPDB.Gathering
         public string UpdatePackageFielPath { get; protected set; }
         public byte[] FielHash { get; protected set; }
         public UpdatePackageType UpdatePackageType { get; protected set; }
-        public UpdatePackagePropertiesFromXmlFile PropertiesFromXmlFile { get; protected set; }
-        public UpdatePackagePropertiesFromPropertyFile PropertiesFromPropertyFile { get; protected set; }
+        public UpdatePackageMetadataFromXmlFile PropertiesFromXmlFile { get; protected set; }
+        public UpdatePackageMetadataFromPropertyFile PropertiesFromPropertyFile { get; protected set; }
 
         private UpdatePackage()
         { }
@@ -46,10 +46,10 @@ namespace UPDB.Gathering
                         // .msu package
 
                         var packageXmlFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*.xml");
-                        package.PropertiesFromXmlFile = new UpdatePackagePropertiesFromXmlFile(packageXmlFilePath);
+                        package.PropertiesFromXmlFile = new UpdatePackageMetadataFromXmlFile(packageXmlFilePath);
 
                         var packagePropertyFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*-pkgProperties.txt");
-                        package.PropertiesFromPropertyFile = new UpdatePackagePropertiesFromPropertyFile(packagePropertyFilePath);
+                        package.PropertiesFromPropertyFile = new UpdatePackageMetadataFromPropertyFile(packagePropertyFilePath);
 
                         var innerCabFilePath = GetInnerCabFilePath(package.PropertiesFromXmlFile.InnerCabFileLocation, workFolderPath);
                         var innerCabWorkFolderPath = CreateWorkFolder(workFolderPath);

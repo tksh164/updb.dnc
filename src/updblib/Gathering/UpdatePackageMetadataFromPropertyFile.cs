@@ -5,7 +5,7 @@ using System.IO;
 
 namespace UPDB.Gathering
 {
-    public class UpdatePackagePropertiesFromPropertyFile
+    public class UpdatePackageMetadataFromPropertyFile
     {
         public string ApplicabilityInfo { get; protected set; }
         public string AppliesTo { get; protected set; }
@@ -22,7 +22,7 @@ namespace UPDB.Gathering
         public string ProductName { get; protected set; }
         public string SupportLink { get; protected set; }
 
-        internal UpdatePackagePropertiesFromPropertyFile(string packagePropertyFilePath)
+        internal UpdatePackageMetadataFromPropertyFile(string packagePropertyFilePath)
         {
             var lines = File.ReadAllLines(packagePropertyFilePath, Encoding.UTF8);
             var properties = new Dictionary<string, string>(lines.Length);

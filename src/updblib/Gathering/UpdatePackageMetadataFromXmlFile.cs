@@ -2,7 +2,7 @@
 
 namespace UPDB.Gathering
 {
-    public class UpdatePackagePropertiesFromXmlFile
+    public class UpdatePackageMetadataFromXmlFile
     {
         public string PackageName { get; protected set; }
         public string PackageVersion { get; protected set; }
@@ -10,7 +10,7 @@ namespace UPDB.Gathering
         public string PackageProcessorArchitecture { get; protected set; }
         public string InnerCabFileLocation { get; protected set; }
 
-        internal UpdatePackagePropertiesFromXmlFile(string packageXmlFilePath)
+        internal UpdatePackageMetadataFromXmlFile(string packageXmlFilePath)
         {
             var rootXmlDoc = new XmlDocument();
             rootXmlDoc.Load(packageXmlFilePath);
