@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml;
 using System.Security.Cryptography;
+using UPDB.Gathering.Helpers;
 
 namespace UPDB.Gathering
 {
@@ -272,28 +273,12 @@ namespace UPDB.Gathering
 
             public static UpdatePackageType Detect(string filePath)
             {
-                var signature = ReadSignature(filePath);
-                if (CompareByteArray(MscfSignature, signature.AsSpan(0, MscfSignature.Length)))
+                var signature = FileSignatureHelper.ReadFileSignature(filePath);
+                if (FileSignatureHelper.CompareFileSignature(MscfSignature, signature.AsSpan(0, MscfSignature.Length)))
                 {
                     return UpdatePackageType.MSCF;
                 }
                 return UpdatePackageType.Unknown;
-            }
-
-            private static byte[] ReadSignature(string filePath)
-            {
-                const int bufferSize = 8;
-                var buffer = new byte[bufferSize];
-                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    stream.Read(buffer, 0, buffer.Length);
-                }
-                return buffer;
-            }
-
-            private static bool CompareByteArray(ReadOnlySpan<byte> a1, ReadOnlySpan<byte> a2)
-            {
-                return a1.SequenceEqual(a2);
             }
         }
 

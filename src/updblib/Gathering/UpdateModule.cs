@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using UPDB.Gathering.Helpers;
 
 namespace updblib.Gathering
 {
@@ -81,32 +82,16 @@ namespace updblib.Gathering
 
             public static UpdateModuleFileType Detect(string filePath)
             {
-                var signature = ReadSignature(filePath);
-                if (CompareByteArray(ExecutableFileSignature, signature.AsSpan(0, ExecutableFileSignature.Length)))
+                var signature = FileSignatureHelper.ReadFileSignature(filePath);
+                if (FileSignatureHelper.CompareFileSignature(ExecutableFileSignature, signature.AsSpan(0, ExecutableFileSignature.Length)))
                 {
                     return UpdateModuleFileType.Executable;
                 }
-                else if (CompareByteArray(XmlFileSignature, signature.AsSpan(0, XmlFileSignature.Length)))
+                else if (FileSignatureHelper.CompareFileSignature(XmlFileSignature, signature.AsSpan(0, XmlFileSignature.Length)))
                 {
                     return UpdateModuleFileType.Xml;
                 }
                 return UpdateModuleFileType.Other;
-            }
-
-            private static byte[] ReadSignature(string filePath)
-            {
-                const int bufferSize = 8;
-                var buffer = new byte[bufferSize];
-                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    stream.Read(buffer, 0, buffer.Length);
-                }
-                return buffer;
-            }
-
-            private static bool CompareByteArray(ReadOnlySpan<byte> a1, ReadOnlySpan<byte> a2)
-            {
-                return a1.SequenceEqual(a2);
             }
         }
     }
