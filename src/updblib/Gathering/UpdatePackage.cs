@@ -88,7 +88,7 @@ namespace UPDB.Gathering
 
                         // TODO: Collect module file data.
 
-                        result.FielHash = ComputeFileHash(updatePackageFilePath);
+                        result.FielHash = FileHashHelper.ComputeFileHash(updatePackageFilePath);
                     }
                     else
                     {
@@ -250,15 +250,6 @@ namespace UPDB.Gathering
                     nameof(innerCabFileLocation));
             }
             return innerCabFileLocation.Replace(placeholderKeyword, workFolderPath, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static byte[] ComputeFileHash(string filePath)
-        {
-            using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                SHA1CryptoServiceProvider sha1Provider = new SHA1CryptoServiceProvider();
-                return sha1Provider.ComputeHash(stream);
-            }
         }
 
         internal enum UpdatePackageType
