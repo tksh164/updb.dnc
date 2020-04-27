@@ -38,14 +38,6 @@ namespace UPDB.Gathering
                 {
                     module.ExecutableModuleProperties = new ExecutableUpdateModuleProperties(updateModuleFilePath);
                 }
-                else if (updateModuleFileType == UpdateModuleFileType.Xml)
-                {
-                    throw new NotImplementedException(string.Format(@"Not suppoerted module file type ""{0}""", updateModuleFilePath));
-                }
-                else
-                {
-                    throw new NotImplementedException(string.Format(@"Not suppoerted module file type ""{0}""", updateModuleFilePath));
-                }
 
                 var fileInfo = new FileInfo(updateModuleFilePath);
                 module.UpdateModuleFileType = updateModuleFileType;
