@@ -41,38 +41,45 @@ namespace UPDB.Gathering
             }
 
             var module = new UpdateModule();
-            var updateModuleFileType = UpdateModuleFileTypeDetector.Detect(updateModuleFilePath);
-            if (updateModuleFileType == UpdateModuleFileType.Executable)
+            try
             {
-                var fileVersionInfo = FileVersionInfo.GetVersionInfo(updateModuleFilePath);
-                module.FileName = Path.GetFileName(fileVersionInfo.FileName.Trim());
-                module.OriginalFileName = fileVersionInfo.OriginalFilename.Trim();
-                module.InternalName = fileVersionInfo.InternalName.Trim();
-                module.FileVersion = fileVersionInfo.FileVersion.Trim();
-                module.FileDescription = fileVersionInfo.FileDescription.Trim();
-                module.ProductName = fileVersionInfo.ProductName.Trim();
-                module.ProductVersion = fileVersionInfo.ProductVersion.Trim();
-                module.Language = fileVersionInfo.Language.Trim();
-                module.CompanyName = fileVersionInfo.CompanyName.Trim();
-                module.LegalCopyright = fileVersionInfo.LegalCopyright.Trim();
-                module.LegalTrademarks = fileVersionInfo.LegalTrademarks.Trim();
-            }
-            else if (updateModuleFileType == UpdateModuleFileType.Xml)
-            {
-                throw new NotImplementedException(string.Format(@"Not suppoerted module file type ""{0}""", updateModuleFilePath));
-            }
-            else
-            {
-                throw new NotImplementedException(string.Format(@"Not suppoerted module file type ""{0}""", updateModuleFilePath));
-            }
+                var updateModuleFileType = UpdateModuleFileTypeDetector.Detect(updateModuleFilePath);
+                if (updateModuleFileType == UpdateModuleFileType.Executable)
+                {
+                    var fileVersionInfo = FileVersionInfo.GetVersionInfo(updateModuleFilePath);
+                    module.FileName = Path.GetFileName(fileVersionInfo.FileName.Trim());
+                    module.OriginalFileName = fileVersionInfo.OriginalFilename.Trim();
+                    module.InternalName = fileVersionInfo.InternalName.Trim();
+                    module.FileVersion = fileVersionInfo.FileVersion.Trim();
+                    module.FileDescription = fileVersionInfo.FileDescription.Trim();
+                    module.ProductName = fileVersionInfo.ProductName.Trim();
+                    module.ProductVersion = fileVersionInfo.ProductVersion.Trim();
+                    module.Language = fileVersionInfo.Language.Trim();
+                    module.CompanyName = fileVersionInfo.CompanyName.Trim();
+                    module.LegalCopyright = fileVersionInfo.LegalCopyright.Trim();
+                    module.LegalTrademarks = fileVersionInfo.LegalTrademarks.Trim();
+                }
+                else if (updateModuleFileType == UpdateModuleFileType.Xml)
+                {
+                    throw new NotImplementedException(string.Format(@"Not suppoerted module file type ""{0}""", updateModuleFilePath));
+                }
+                else
+                {
+                    throw new NotImplementedException(string.Format(@"Not suppoerted module file type ""{0}""", updateModuleFilePath));
+                }
 
-            var fileInfo = new FileInfo(updateModuleFilePath);
-            module.UpdateModuleFileType = updateModuleFileType;
-            module.FileSize = fileInfo.Length;
-            module.LastModifiedDateTimeUtc = fileInfo.LastWriteTimeUtc;
+                var fileInfo = new FileInfo(updateModuleFilePath);
+                module.UpdateModuleFileType = updateModuleFileType;
+                module.FileSize = fileInfo.Length;
+                module.LastModifiedDateTimeUtc = fileInfo.LastWriteTimeUtc;
 
-            module.UpdateModuleFilePath = updateModuleFilePath;
-            module.FielHash = FileHashHelper.ComputeFileHash(updateModuleFilePath);
+                module.UpdateModuleFilePath = updateModuleFilePath;
+                module.FielHash = FileHashHelper.ComputeFileHash(updateModuleFilePath);
+            }
+            catch (Exception e)
+            {
+                throw new UpdateModuleDataRetrieveException(updateModuleFilePath, e);
+            }
 
             return module;
         }

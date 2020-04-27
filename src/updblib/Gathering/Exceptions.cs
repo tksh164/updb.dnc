@@ -98,4 +98,19 @@ namespace UPDB.Gathering
             Attribute = attribute;
         }
     }
+
+    public class UpdateModuleDataRetrieveException : Exception
+    {
+        public string UpdateModuleFilePath { get; private set; }
+
+        public UpdateModuleDataRetrieveException(string updateModuleFilePath)
+            : this(updateModuleFilePath, null)
+        { }
+
+        public UpdateModuleDataRetrieveException(string updateModuleFilePath, Exception innerException)
+            : base(string.Format(@"Could not retrieve the data from update module ""{0}"".", updateModuleFilePath), innerException)
+        {
+            UpdateModuleFilePath = updateModuleFilePath;
+        }
+    }
 }
