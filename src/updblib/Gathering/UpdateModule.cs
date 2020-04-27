@@ -18,18 +18,18 @@ namespace updblib.Gathering
         public string UpdateModuleFilePath { get; protected set; }
         public UpdateModuleFileType UpdateModuleFileType { get; protected set; }
         public long FileSize { get; protected set; }
-        public string OriginalFileName { get; protected set; }
-        public string FileVersion { get; protected set; }
         public DateTime LastModifiedDateTimeUtc { get; protected set; }
-        public string CompanyName { get; protected set; }
-        public string FileDescription { get; protected set; }
         public string FileName { get; protected set; }
+        public string OriginalFileName { get; protected set; }
         public string InternalName { get; protected set; }
-        public string Language { get; protected set; }
-        public string LegalCopyright { get; protected set; }
-        public string LegalTrademarks { get; protected set; }
+        public string FileVersion { get; protected set; }
+        public string FileDescription { get; protected set; }
         public string ProductName { get; protected set; }
         public string ProductVersion { get; protected set; }
+        public string Language { get; protected set; }
+        public string CompanyName { get; protected set; }
+        public string LegalCopyright { get; protected set; }
+        public string LegalTrademarks { get; protected set; }
 
         public static UpdateModule RetrieveData(string updateModuleFilePath)
         {
@@ -51,17 +51,17 @@ namespace updblib.Gathering
             if (updateModuleFileType == UpdateModuleFileType.Executable)
             {
                 var fileVersionInfo = FileVersionInfo.GetVersionInfo(updateModuleFilePath);
-                result.OriginalFileName = fileVersionInfo.OriginalFilename.Trim();
-                result.FileVersion = fileVersionInfo.FileVersion.Trim();
-                result.CompanyName = fileVersionInfo.CompanyName.Trim();
-                result.FileDescription = fileVersionInfo.FileDescription.Trim();
                 result.FileName = Path.GetFileName(fileVersionInfo.FileName.Trim());
+                result.OriginalFileName = fileVersionInfo.OriginalFilename.Trim();
                 result.InternalName = fileVersionInfo.InternalName.Trim();
-                result.Language = fileVersionInfo.Language.Trim();
-                result.LegalCopyright = fileVersionInfo.LegalCopyright.Trim();
-                result.LegalTrademarks = fileVersionInfo.LegalTrademarks.Trim();
+                result.FileVersion = fileVersionInfo.FileVersion.Trim();
+                result.FileDescription = fileVersionInfo.FileDescription.Trim();
                 result.ProductName = fileVersionInfo.ProductName.Trim();
                 result.ProductVersion = fileVersionInfo.ProductVersion.Trim();
+                result.Language = fileVersionInfo.Language.Trim();
+                result.CompanyName = fileVersionInfo.CompanyName.Trim();
+                result.LegalCopyright = fileVersionInfo.LegalCopyright.Trim();
+                result.LegalTrademarks = fileVersionInfo.LegalTrademarks.Trim();
             }
             else if (updateModuleFileType == UpdateModuleFileType.Xml)
             {
