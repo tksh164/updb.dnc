@@ -5,7 +5,7 @@ using System.IO;
 using System.Diagnostics;
 using UPDB.Gathering.Helpers;
 
-namespace updblib.Gathering
+namespace UPDB.Gathering
 {
     public enum UpdateModuleFileType
     {
