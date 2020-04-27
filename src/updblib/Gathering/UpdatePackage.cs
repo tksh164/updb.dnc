@@ -57,7 +57,7 @@ namespace UPDB.Gathering
                 try
                 {
                     workFolderPath = CreateWorkFolder();
-                    MscfUpdatePackageExtractor.Extract(updatePackageFilePath, workFolderPath);
+                    ExtractMscfUpdatePackageFile(updatePackageFilePath, workFolderPath);
 
                     if (VerifyWsusScanCabExistence(workFolderPath))
                     {
@@ -89,7 +89,7 @@ namespace UPDB.Gathering
 
                         var innerCabFilePath = GetInnerCabFilePath(packageMetadataFromXmlFile.InnerCabFileLocation, workFolderPath);
                         var innerCabWorkFolderPath = CreateWorkFolder(workFolderPath);
-                        MscfUpdatePackageExtractor.Extract(innerCabFilePath, innerCabWorkFolderPath);
+                        ExtractMscfUpdatePackageFile(innerCabFilePath, innerCabWorkFolderPath);
 
                         // TODO: Collect module file data.
                     }
@@ -151,6 +151,41 @@ namespace UPDB.Gathering
             Directory.CreateDirectory(workFolderPath);
             Debug.WriteLine("WorkFolderPath: {0}", workFolderPath);
             return workFolderPath;
+        }
+
+        private static void ExtractMscfUpdatePackageFile(string updatePackageFilePath, string destinationFolderPath)
+        {
+            const string commandFilePath = @"C:\Windows\System32\expand.exe";
+            var commandParameter = string.Format(@"-f:* ""{0}"" ""{1}""", updatePackageFilePath, destinationFolderPath);
+
+            ProcessStartInfo processStartInfo = new ProcessStartInfo()
+            {
+                FileName = commandFilePath,
+                Arguments = commandParameter,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            };
+
+            using (Process process = Process.Start(processStartInfo))
+            {
+                StringBuilder outputData = new StringBuilder();
+                process.OutputDataReceived += (object sender, DataReceivedEventArgs e) => {
+                    outputData.Append(e.Data);
+                };
+                StringBuilder errorData = new StringBuilder();
+                process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => {
+                    errorData.Append(e.Data);
+                };
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                {
+                    throw new ExternalCommandException(process, outputData.ToString(), errorData.ToString());
+                }
+            }
         }
 
         private static bool VerifyWsusScanCabExistence(string workFolderPath)
@@ -269,49 +304,6 @@ namespace UPDB.Gathering
                     nameof(innerCabFileLocation));
             }
             return innerCabFileLocation.Replace(placeholderKeyword, workFolderPath, StringComparison.OrdinalIgnoreCase);
-        }
-
-        internal class MscfUpdatePackageExtractor
-        {
-            private const string CommandFilePath = @"C:\Windows\System32\expand.exe";
-
-            public static void Extract(string updatePackageFilePath, string destinationFolderPath)
-            {
-                var commandParameter = string.Format(@"-f:* ""{0}"" ""{1}""", updatePackageFilePath, destinationFolderPath);
-                ExecuteExternalCommand(CommandFilePath, commandParameter);
-            }
-
-            private static void ExecuteExternalCommand(string commandFilePath, string commandParameter = null)
-            {
-                ProcessStartInfo processStartInfo = new ProcessStartInfo()
-                {
-                    FileName = commandFilePath,
-                    Arguments = commandParameter ?? string.Empty,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                };
-
-                using (Process process = Process.Start(processStartInfo))
-                {
-                    StringBuilder outputData = new StringBuilder();
-                    process.OutputDataReceived += (object sender, DataReceivedEventArgs e) => {
-                        outputData.Append(e.Data);
-                    };
-                    StringBuilder errorData = new StringBuilder();
-                    process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => {
-                        errorData.Append(e.Data);
-                    };
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
-                    process.WaitForExit();
-
-                    if (process.ExitCode != 0)
-                    {
-                        throw new ExternalCommandException(process, outputData.ToString(), errorData.ToString());
-                    }
-                }
-            }
         }
     }
 }
