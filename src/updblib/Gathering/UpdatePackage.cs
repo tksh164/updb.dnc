@@ -6,13 +6,21 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml;
 using System.Security.Cryptography;
+using UPDB.Gathering.Helpers;
 
 namespace UPDB.Gathering
 {
+    public enum UpdatePackageType
+    {
+        Unknown,   // Unknown update package type
+        MSCF,      // .msu, .cab
+    };
+
     public class UpdatePackage
     {
         public string UpdatePackageFielPath { get; protected set; }
         public byte[] FielHash { get; protected set; }
+        public UpdatePackageType UpdatePackageType { get; protected set; }
         public string PackageName { get; protected set; }
         public string PackageVersion { get; protected set; }
         public string PackageLanguage { get; protected set; }
@@ -39,12 +47,8 @@ namespace UPDB.Gathering
                 throw new ArgumentException(string.Format(@"The path ""{0}"" was not a file path. It was a path to a directory.", updatePackageFilePath), nameof(updatePackageFilePath));
             }
 
-            var result = new UpdatePackage()
-            {
-                UpdatePackageFielPath = updatePackageFilePath,
-            };
-
-            var updatePackageType = UpdatePackageTypeDetector.Detect(updatePackageFilePath);
+            var package = new UpdatePackage();
+            var updatePackageType = DetectUpdatePackageType(updatePackageFilePath);
             if (updatePackageType == UpdatePackageType.MSCF)
             {
                 string workFolderPath = null;
@@ -59,35 +63,33 @@ namespace UPDB.Gathering
 
                         var packageXmlFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*.xml");
                         var packageMetadataFromXmlFile = GetPackageMetadataFromXmlFile(packageXmlFilePath);
-                        result.PackageName = packageMetadataFromXmlFile.PackageName;
-                        result.PackageVersion = packageMetadataFromXmlFile.PackageVersion;
-                        result.PackageLanguage = packageMetadataFromXmlFile.PackageLanguage;
-                        result.PackageProcessorArchitecture = packageMetadataFromXmlFile.PackageProcessorArchitecture;
+                        package.PackageName = packageMetadataFromXmlFile.PackageName;
+                        package.PackageVersion = packageMetadataFromXmlFile.PackageVersion;
+                        package.PackageLanguage = packageMetadataFromXmlFile.PackageLanguage;
+                        package.PackageProcessorArchitecture = packageMetadataFromXmlFile.PackageProcessorArchitecture;
 
                         var packagePropertyFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*-pkgProperties.txt");
                         var packageMetadataFromPropertyFile = GetPackageMetadataFromPropertyFile(packagePropertyFilePath);
-                        result.ApplicabilityInfoProperty = packageMetadataFromPropertyFile.ApplicabilityInfo;
-                        result.AppliesToProperty = packageMetadataFromPropertyFile.AppliesTo;
-                        result.BuildDateProperty = packageMetadataFromPropertyFile.BuildDate;
-                        result.CompanyProperty = packageMetadataFromPropertyFile.Company;
-                        result.FileVersionProperty = packageMetadataFromPropertyFile.FileVersion;
-                        result.InstallationTypeProperty = packageMetadataFromPropertyFile.InstallationType;
-                        result.InstallerEngineProperty = packageMetadataFromPropertyFile.InstallerEngine;
-                        result.InstallerVersionProperty = packageMetadataFromPropertyFile.InstallerVersion;
-                        result.KBArticleNumberProperty = packageMetadataFromPropertyFile.KBArticleNumber;
-                        result.LanguageProperty = packageMetadataFromPropertyFile.Language;
-                        result.PackageTypeProperty = packageMetadataFromPropertyFile.PackageType;
-                        result.ProcessorArchitectureProperty = packageMetadataFromPropertyFile.ProcessorArchitecture;
-                        result.ProductNameProperty = packageMetadataFromPropertyFile.ProductName;
-                        result.SupportLinkProperty = packageMetadataFromPropertyFile.SupportLink;
+                        package.ApplicabilityInfoProperty = packageMetadataFromPropertyFile.ApplicabilityInfo;
+                        package.AppliesToProperty = packageMetadataFromPropertyFile.AppliesTo;
+                        package.BuildDateProperty = packageMetadataFromPropertyFile.BuildDate;
+                        package.CompanyProperty = packageMetadataFromPropertyFile.Company;
+                        package.FileVersionProperty = packageMetadataFromPropertyFile.FileVersion;
+                        package.InstallationTypeProperty = packageMetadataFromPropertyFile.InstallationType;
+                        package.InstallerEngineProperty = packageMetadataFromPropertyFile.InstallerEngine;
+                        package.InstallerVersionProperty = packageMetadataFromPropertyFile.InstallerVersion;
+                        package.KBArticleNumberProperty = packageMetadataFromPropertyFile.KBArticleNumber;
+                        package.LanguageProperty = packageMetadataFromPropertyFile.Language;
+                        package.PackageTypeProperty = packageMetadataFromPropertyFile.PackageType;
+                        package.ProcessorArchitectureProperty = packageMetadataFromPropertyFile.ProcessorArchitecture;
+                        package.ProductNameProperty = packageMetadataFromPropertyFile.ProductName;
+                        package.SupportLinkProperty = packageMetadataFromPropertyFile.SupportLink;
 
                         var innerCabFilePath = GetInnerCabFilePath(packageMetadataFromXmlFile.InnerCabFileLocation, workFolderPath);
                         var innerCabWorkFolderPath = CreateWorkFolder(workFolderPath);
                         MscfUpdatePackageExtractor.Extract(innerCabFilePath, innerCabWorkFolderPath);
 
                         // TODO: Collect module file data.
-
-                        result.FielHash = ComputeFileHash(updatePackageFilePath);
                     }
                     else
                     {
@@ -112,7 +114,23 @@ namespace UPDB.Gathering
                 throw new UnknownUpdatePackageTypeException(updatePackageFilePath);
             }
 
-            return result;
+            package.UpdatePackageFielPath = updatePackageFilePath;
+            package.FielHash = FileHashHelper.ComputeFileHash(updatePackageFilePath);
+            package.UpdatePackageType = updatePackageType;
+
+            return package;
+        }
+
+        private static readonly byte[] MscfSignature = new byte[] { 0x4D, 0x53, 0x43, 0x46 };  // M, S, C, F
+
+        private static UpdatePackageType DetectUpdatePackageType(string updatePackageFilePath)
+        {
+            var signature = FileSignatureHelper.ReadFileSignature(updatePackageFilePath);
+            if (FileSignatureHelper.CompareFileSignature(MscfSignature, signature.AsSpan(0, MscfSignature.Length)))
+            {
+                return UpdatePackageType.MSCF;
+            }
+            return UpdatePackageType.Unknown;
         }
 
         private static string CreateWorkFolder()
@@ -249,52 +267,6 @@ namespace UPDB.Gathering
                     nameof(innerCabFileLocation));
             }
             return innerCabFileLocation.Replace(placeholderKeyword, workFolderPath, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static byte[] ComputeFileHash(string filePath)
-        {
-            using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                SHA1CryptoServiceProvider sha1Provider = new SHA1CryptoServiceProvider();
-                return sha1Provider.ComputeHash(stream);
-            }
-        }
-
-        internal enum UpdatePackageType
-        {
-            Unknown,   // Unknown update package type
-            MSCF,      // .msu, .cab
-        };
-
-        internal class UpdatePackageTypeDetector
-        {
-            private static readonly byte[] MscfSignature = new byte[] { 0x4D, 0x53, 0x43, 0x46 };  // M, S, C, F
-
-            public static UpdatePackageType Detect(string filePath)
-            {
-                var signature = ReadSignature(filePath);
-                if (CompareByteArray(MscfSignature, signature.AsSpan(0, MscfSignature.Length)))
-                {
-                    return UpdatePackageType.MSCF;
-                }
-                return UpdatePackageType.Unknown;
-            }
-
-            private static byte[] ReadSignature(string filePath)
-            {
-                const int bufferSize = 8;
-                var buffer = new byte[bufferSize];
-                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    stream.Read(buffer, 0, buffer.Length);
-                }
-                return buffer;
-            }
-
-            private static bool CompareByteArray(ReadOnlySpan<byte> a1, ReadOnlySpan<byte> a2)
-            {
-                return a1.SequenceEqual(a2);
-            }
         }
 
         internal class MscfUpdatePackageExtractor
