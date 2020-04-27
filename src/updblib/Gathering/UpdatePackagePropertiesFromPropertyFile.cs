@@ -7,20 +7,20 @@ namespace UPDB.Gathering
 {
     public class UpdatePackagePropertiesFromPropertyFile
     {
-        public string ApplicabilityInfoProperty { get; protected set; }
-        public string AppliesToProperty { get; protected set; }
-        public string BuildDateProperty { get; protected set; }
-        public string CompanyProperty { get; protected set; }
-        public string FileVersionProperty { get; protected set; }
-        public string InstallationTypeProperty { get; protected set; }
-        public string InstallerEngineProperty { get; protected set; }
-        public string InstallerVersionProperty { get; protected set; }
-        public string KBArticleNumberProperty { get; protected set; }
-        public string LanguageProperty { get; protected set; }
-        public string PackageTypeProperty { get; protected set; }
-        public string ProcessorArchitectureProperty { get; protected set; }
-        public string ProductNameProperty { get; protected set; }
-        public string SupportLinkProperty { get; protected set; }
+        public string ApplicabilityInfo { get; protected set; }
+        public string AppliesTo { get; protected set; }
+        public string BuildDate { get; protected set; }
+        public string Company { get; protected set; }
+        public string FileVersion { get; protected set; }
+        public string InstallationType { get; protected set; }
+        public string InstallerEngine { get; protected set; }
+        public string InstallerVersion { get; protected set; }
+        public string KBArticleNumber { get; protected set; }
+        public string Language { get; protected set; }
+        public string PackageType { get; protected set; }
+        public string ProcessorArchitecture { get; protected set; }
+        public string ProductName { get; protected set; }
+        public string SupportLink { get; protected set; }
 
         internal UpdatePackagePropertiesFromPropertyFile(string packagePropertyFilePath)
         {
@@ -31,20 +31,20 @@ namespace UPDB.Gathering
                 (var key, var value) = ExtractKeyValue(line);
                 properties.Add(key, value);
             }
-            ApplicabilityInfoProperty = properties["ApplicabilityInfo"];
-            AppliesToProperty = properties["Applies to"];
-            BuildDateProperty = properties["Build Date"];
-            CompanyProperty = properties["Company"];
-            FileVersionProperty = properties["File Version"];
-            InstallationTypeProperty = properties["Installation Type"];
-            InstallerEngineProperty = properties["Installer Engine"];
-            InstallerVersionProperty = properties["Installer Version"];
-            KBArticleNumberProperty = properties["KB Article Number"];
-            LanguageProperty = properties["Language"];
-            PackageTypeProperty = properties["Package Type"];
-            ProcessorArchitectureProperty = properties["Processor Architecture"];
-            ProductNameProperty = properties["Product Name"];
-            SupportLinkProperty = properties["Support Link"];
+            ApplicabilityInfo = properties["ApplicabilityInfo"];
+            AppliesTo = properties["Applies to"];
+            BuildDate = properties["Build Date"];
+            Company = properties["Company"];
+            FileVersion = properties["File Version"];
+            InstallationType = properties["Installation Type"];
+            InstallerEngine = properties["Installer Engine"];
+            InstallerVersion = properties["Installer Version"];
+            KBArticleNumber = properties["KB Article Number"];
+            Language = properties["Language"];
+            PackageType = properties["Package Type"];
+            ProcessorArchitecture = properties["Processor Architecture"];
+            ProductName = properties["Product Name"];
+            SupportLink = properties["Support Link"];
         }
 
         private static (string Key, string Value) ExtractKeyValue(string line)
