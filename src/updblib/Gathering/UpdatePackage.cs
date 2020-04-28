@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using UPDB.Gathering.Helpers;
+using System.Collections.Generic;
 
 namespace UPDB.Gathering
 {
@@ -20,6 +21,7 @@ namespace UPDB.Gathering
         public UpdatePackageType UpdatePackageType { get; protected set; }
         public UpdatePackageMetadataFromXmlFile PropertiesFromXmlFile { get; protected set; }
         public UpdatePackageMetadataFromPropertyFile PropertiesFromPropertyFile { get; protected set; }
+        public List<UpdateModule> UpdateModules { get; protected set; }
 
         private UpdatePackage()
         { }
@@ -55,7 +57,7 @@ namespace UPDB.Gathering
                         var innerCabWorkFolderPath = CreateWorkFolder(workFolderPath);
                         ExtractMscfUpdatePackageFile(innerCabFilePath, innerCabWorkFolderPath);
 
-                        // TODO: Collect module file data.
+                        package.UpdateModules = RetrieveUpdateModules(innerCabWorkFolderPath);
                     }
                     else
                     {
@@ -178,6 +180,39 @@ namespace UPDB.Gathering
                     nameof(innerCabFileLocation));
             }
             return innerCabFileLocation.Replace(placeholderKeyword, workFolderPath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static List<UpdateModule> RetrieveUpdateModules(string innerCabWorkFolderPath)
+        {
+            var moduleFolderEnumOptions = new EnumerationOptions()
+            {
+                AttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
+                BufferSize = 0,
+                IgnoreInaccessible = false,
+                MatchCasing = MatchCasing.CaseInsensitive,
+                MatchType = MatchType.Simple,
+                ReturnSpecialDirectories = false,
+                RecurseSubdirectories = false,
+            };
+            var moduleFileEnumOptions = new EnumerationOptions()
+            {
+                AttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
+                BufferSize = 0,
+                IgnoreInaccessible = false,
+                MatchCasing = MatchCasing.CaseInsensitive,
+                MatchType = MatchType.Simple,
+                ReturnSpecialDirectories = false,
+                RecurseSubdirectories = true,
+            };
+            var updateModules = new List<UpdateModule>();
+            foreach (var moduleFolderPath in Directory.EnumerateDirectories(innerCabWorkFolderPath, "*", moduleFolderEnumOptions))
+            {
+                foreach (var moduleFilePath in Directory.EnumerateFiles(moduleFolderPath, "*", moduleFileEnumOptions))
+                {
+                    updateModules.Add(UpdateModule.RetrieveData(moduleFilePath));
+                }
+            }
+            return updateModules;
         }
     }
 }
