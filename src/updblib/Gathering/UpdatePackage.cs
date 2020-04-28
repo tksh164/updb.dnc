@@ -156,13 +156,33 @@ namespace UPDB.Gathering
 
         private static bool VerifyWsusScanCabExistence(string workFolderPath)
         {
-            var wsusScanCabFilePath = Directory.EnumerateFiles(workFolderPath, "WSUSSCAN.cab", SearchOption.TopDirectoryOnly).FirstOrDefault();
+            var enumOptions = new EnumerationOptions()
+            {
+                AttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
+                BufferSize = 0,
+                IgnoreInaccessible = false,
+                MatchCasing = MatchCasing.CaseInsensitive,
+                MatchType = MatchType.Simple,
+                ReturnSpecialDirectories = false,
+                RecurseSubdirectories = false,
+            };
+            var wsusScanCabFilePath = Directory.EnumerateFiles(workFolderPath, "WSUSSCAN.cab", enumOptions).FirstOrDefault();
             return wsusScanCabFilePath != null;
         }
 
         private static string GetFilePathDirectlyUnderFolder(string workFolderPath, string fileNamePattern)
         {
-            var filePath = Directory.EnumerateFiles(workFolderPath, fileNamePattern, SearchOption.TopDirectoryOnly).FirstOrDefault();
+            var enumOptions = new EnumerationOptions()
+            {
+                AttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
+                BufferSize = 0,
+                IgnoreInaccessible = false,
+                MatchCasing = MatchCasing.CaseInsensitive,
+                MatchType = MatchType.Simple,
+                ReturnSpecialDirectories = false,
+                RecurseSubdirectories = false,
+            };
+            var filePath = Directory.EnumerateFiles(workFolderPath, fileNamePattern, enumOptions).FirstOrDefault();
             if (filePath == null)
             {
                 throw new UpdatePackageCriticalFileNotFoundException(Path.Combine(workFolderPath, fileNamePattern));
