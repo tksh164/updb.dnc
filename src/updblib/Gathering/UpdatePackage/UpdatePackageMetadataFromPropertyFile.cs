@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Globalization;
 
 namespace UPDB.Gathering
 {
@@ -9,7 +10,7 @@ namespace UPDB.Gathering
     {
         public string ApplicabilityInfo { get; protected set; }
         public string AppliesTo { get; protected set; }
-        public string BuildDate { get; protected set; }
+        public DateTime BuildDate { get; protected set; }
         public string Company { get; protected set; }
         public string FileVersion { get; protected set; }
         public string InstallationType { get; protected set; }
@@ -31,9 +32,11 @@ namespace UPDB.Gathering
                 (var key, var value) = ExtractKeyValue(line);
                 properties.Add(key, value);
             }
+
             ApplicabilityInfo = properties["ApplicabilityInfo"];
             AppliesTo = properties["Applies to"];
-            BuildDate = properties["Build Date"];
+            var buildDate = properties["Build Date"];
+            BuildDate = DateTime.ParseExact(buildDate, "yyyy/MM/dd", CultureInfo.InvariantCulture);
             Company = properties["Company"];
             FileVersion = properties["File Version"];
             InstallationType = properties["Installation Type"];
