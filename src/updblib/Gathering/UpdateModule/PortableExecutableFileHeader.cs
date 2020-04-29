@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace UPDB.Gathering.Helpers
+namespace UPDB.Gathering
 {
     internal sealed class PortableExecutableFileHeader
     {
