@@ -21,6 +21,7 @@ namespace UPDB.Gathering
         public UpdatePackageType UpdatePackageType { get; protected set; }
         public UpdatePackageMetadataFromXmlFile PropertiesFromXmlFile { get; protected set; }
         public UpdatePackageMetadataFromPropertyFile PropertiesFromPropertyFile { get; protected set; }
+        public UpdatePackageMetadataFromUpdateMumFile PropertiesFromUpdateMumFile { get; protected set; }
         public List<UpdateModule> UpdateModules { get; protected set; }
 
         private UpdatePackage()
@@ -56,6 +57,9 @@ namespace UPDB.Gathering
                         var innerCabFilePath = GetInnerCabFilePath(package.PropertiesFromXmlFile.InnerCabFileLocation, workFolderPath);
                         var innerCabWorkFolderPath = CreateWorkFolder(workFolderPath);
                         ExtractMscfUpdatePackageFile(innerCabFilePath, innerCabWorkFolderPath);
+
+                        var updateMumFilePath = GetFilePathDirectlyUnderFolder(innerCabWorkFolderPath, "update.mum");
+                        package.PropertiesFromUpdateMumFile = new UpdatePackageMetadataFromUpdateMumFile(updateMumFilePath);
 
                         package.UpdateModules = RetrieveUpdateModules(innerCabWorkFolderPath);
                     }
