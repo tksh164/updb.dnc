@@ -46,8 +46,22 @@ namespace UPDB.Gathering
             ApplicabilityEvaluation = xmlDoc.GetXmlAttributeValue("/u:assembly/u:package", "applicabilityEvaluation");
             ReleaseType = xmlDoc.GetXmlAttributeValue("/u:assembly/u:package", "releaseType");
             Restart = xmlDoc.GetXmlAttributeValue("/u:assembly/u:package", "restart");
-            SelfUpdate = xmlDoc.GetXmlAttributeValue("/u:assembly/u:package", "selfUpdate");
-            Permanence = xmlDoc.GetXmlAttributeValue("/u:assembly/u:package", "permanence");
+            try
+            {
+                SelfUpdate = xmlDoc.GetXmlAttributeValue("/u:assembly/u:package", "selfUpdate");
+            }
+            catch (UpdatePackageXmlAttributeNotFoundException)
+            {
+                SelfUpdate = null;
+            }
+            try
+            {
+                Permanence = xmlDoc.GetXmlAttributeValue("/u:assembly/u:package", "permanence");
+            }
+            catch (UpdatePackageXmlAttributeNotFoundException)
+            {
+                Permanence = null;
+            }
         }
     }
 }
