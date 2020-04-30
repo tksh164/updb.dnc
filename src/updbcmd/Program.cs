@@ -10,7 +10,8 @@ namespace updbcmd
             var trimChars = new char[] { ' ', '\t', '"', '\'' };
             while (true)
             {
-                var filePath = Console.ReadLine().Trim(trimChars);
+                var filePath = Console.ReadLine();
+                if (filePath != null) filePath = filePath.Trim(trimChars);
                 if (string.IsNullOrWhiteSpace(filePath)) break;
                 var updatePackage = UpdatePackage.RetrieveData(filePath);
             }
