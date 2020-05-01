@@ -32,16 +32,16 @@ namespace UPDB.Gathering
         {
             var fileVersionInfo = FileVersionInfo.GetVersionInfo(executableUpdateModuleFilePath);
             FileName = Path.GetFileName(fileVersionInfo.FileName.Trim());
-            OriginalFileName = fileVersionInfo.OriginalFilename.Trim();
-            InternalName = fileVersionInfo.InternalName.Trim();
-            FileVersion = fileVersionInfo.FileVersion.Trim();
-            FileDescription = fileVersionInfo.FileDescription.Trim();
-            ProductName = fileVersionInfo.ProductName.Trim();
-            ProductVersion = fileVersionInfo.ProductVersion.Trim();
-            Language = fileVersionInfo.Language.Trim();
-            CompanyName = fileVersionInfo.CompanyName.Trim();
-            LegalCopyright = fileVersionInfo.LegalCopyright.Trim();
-            LegalTrademarks = fileVersionInfo.LegalTrademarks.Trim();
+            OriginalFileName = fileVersionInfo.OriginalFilename?.Trim();
+            InternalName = fileVersionInfo.InternalName?.Trim();
+            FileVersion = fileVersionInfo.FileVersion?.Trim();
+            FileDescription = fileVersionInfo.FileDescription?.Trim();
+            ProductName = fileVersionInfo.ProductName?.Trim();
+            ProductVersion = fileVersionInfo.ProductVersion?.Trim();
+            Language = fileVersionInfo.Language?.Trim();
+            CompanyName = fileVersionInfo.CompanyName?.Trim();
+            LegalCopyright = fileVersionInfo.LegalCopyright?.Trim();
+            LegalTrademarks = fileVersionInfo.LegalTrademarks?.Trim();
             ProcessorArchitecture = ReadModuleProcessorArchitecture(executableUpdateModuleFilePath);
         }
 
