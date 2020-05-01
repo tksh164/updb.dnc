@@ -5,7 +5,12 @@ VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "updbcmd", "updbcmd\updbcmd.csproj", "{543783FB-8E72-4465-91F4-04BD3167CB24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "updblib", "updblib\updblib.csproj", "{95CC44AD-E4E3-4D8F-81AB-F475D2391634}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "updblib", "updblib\updblib.csproj", "{95CC44AD-E4E3-4D8F-81AB-F475D2391634}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5C53F74E-B24A-4C06-986A-A9DFCCAFF51C}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
