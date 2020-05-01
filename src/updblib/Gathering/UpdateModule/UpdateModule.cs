@@ -36,14 +36,7 @@ namespace UPDB.Gathering
                 var updateModuleFileType = DetectUpdateModuleFileType(updateModuleFilePath);
                 if (updateModuleFileType == UpdateModuleFileType.Executable)
                 {
-                    if (!HasNonExecutableExtension(updateModuleFilePath))
-                    {
-                        module.ExecutableModuleProperties = new ExecutableUpdateModuleProperties(updateModuleFilePath);
-                    }
-                    else
-                    {
-                        updateModuleFileType = UpdateModuleFileType.Other;
-                    }
+                    module.ExecutableModuleProperties = new ExecutableUpdateModuleProperties(updateModuleFilePath);
                 }
 
                 var fileInfo = new FileInfo(updateModuleFilePath);
@@ -77,16 +70,6 @@ namespace UPDB.Gathering
                 return UpdateModuleFileType.Xml;
             }
             return UpdateModuleFileType.Other;
-        }
-
-        private static bool HasNonExecutableExtension(string updateModuleFilePath)
-        {
-            var nonExecutableExtensions = new string[] { ".winmd" };
-            foreach (var extension in nonExecutableExtensions)
-            {
-                if (updateModuleFilePath.EndsWith(extension)) return true;
-            }
-            return false;
         }
     }
 }
