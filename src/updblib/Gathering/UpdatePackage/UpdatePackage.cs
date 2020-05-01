@@ -51,7 +51,7 @@ namespace UPDB.Gathering
                         var packageXmlFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*.xml");
                         package.PropertiesFromXmlFile = new UpdatePackageMetadataFromXmlFile(packageXmlFilePath);
 
-                        var packagePropertyFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*-pkgProperties.txt");
+                        var packagePropertyFilePath = GetFilePathDirectlyUnderFolder(workFolderPath, "*-pkgProperties*.txt");
                         package.PropertiesFromPropertyFile = new UpdatePackageMetadataFromPropertyFile(packagePropertyFilePath);
 
                         var innerCabFilePath = GetInnerCabFilePath(package.PropertiesFromXmlFile.InnerCabFileLocation, workFolderPath);
