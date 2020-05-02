@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using UPDB.Gathering;
 
 namespace updbcmd
@@ -9,8 +10,14 @@ namespace updbcmd
     {
         static async Task Main(string[] args)
         {
+            var sw = new Stopwatch();
+            sw.Start();
+
             const int ConsumerThreadCount = 6;
             await ProcessUpdatePackages(ConsumerThreadCount);
+
+            sw.Stop();
+            Console.WriteLine("Elapsed: {0}", sw.Elapsed.TotalSeconds);
         }
 
         private static async Task ProcessUpdatePackages(int numOfConsumerTasks)
