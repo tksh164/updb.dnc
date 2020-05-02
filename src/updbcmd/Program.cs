@@ -34,7 +34,7 @@ namespace updbcmd
                         consumerTasks = new Task[numOfConsumerTasks];
                         for (var i = 0; i < consumerTasks.Length; i++)
                         {
-                            consumerTasks[i] = Task<int>.Factory.StartNew(ConsumerAction, consumerActionParams, TaskCreationOptions.LongRunning);
+                            consumerTasks[i] = Task<(int Succeeded, int Failed)>.Factory.StartNew(ConsumerAction, consumerActionParams, TaskCreationOptions.LongRunning);
                         }
 
                         // Combine the producer task and consumer tasks to wait for finish all task.
@@ -84,7 +84,6 @@ namespace updbcmd
         private static int ProducerAction(object actionParams)
         {
             var ap = actionParams as ProducerActionParameters;
-
             var trimChars = new char[] { ' ', '\t', '"', '\'' };
             var addedCount = 0;
             while (true)
@@ -109,10 +108,11 @@ namespace updbcmd
             }
         }
 
-        private static int ConsumerAction(object actionParams)
+        private static (int Succeeded, int Failed) ConsumerAction(object actionParams)
         {
             var ap = actionParams as ConsumerActionParameters;
-            var count = 0;
+            var succeededCount = 0;
+            var failedCount = 0;
             while (true)
             {
                 ProcessItem item;
@@ -122,13 +122,22 @@ namespace updbcmd
                 }
                 catch (InvalidOperationException)
                 {
-                    Console.WriteLine("Complete take: {0}", count);
+                    Console.WriteLine("Succeeded count: {0}, Failed count: {1}", succeededCount, failedCount);
                     break;
                 }
-                var updatePackage = UpdatePackage.RetrieveData(item.FilePath);
-                count++;
+
+                try
+                {
+                    var updatePackage = UpdatePackage.RetrieveData(item.FilePath);
+                    succeededCount++;
+                }
+                catch (Exception e)
+                {
+                    failedCount++;
+                    Console.WriteLine(e.ToString());
+                }
             }
-            return count;
+            return (Succeeded: succeededCount, Failed: failedCount);
         }
     }
 }
