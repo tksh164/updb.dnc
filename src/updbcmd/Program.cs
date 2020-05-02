@@ -86,17 +86,17 @@ namespace updbcmd
             var ap = actionParams as ProducerActionParameters;
 
             var trimChars = new char[] { ' ', '\t', '"', '\'' };
-            var count = 0;
+            var addedCount = 0;
             while (true)
             {
                 var filePath = Console.ReadLine()?.Trim(trimChars);
                 if (string.IsNullOrWhiteSpace(filePath)) break;
                 ap.ProcessItems.Add(new ProcessItem(filePath));
-                count++;
+                addedCount++;
             }
             ap.ProcessItems.CompleteAdding();
-            Console.WriteLine("Complete adding: {0}", count);
-            return count;
+            Console.WriteLine("Added count: {0}", addedCount);
+            return addedCount;
         }
 
         internal sealed class ConsumerActionParameters
