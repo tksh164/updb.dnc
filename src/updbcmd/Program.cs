@@ -15,7 +15,7 @@ namespace updbcmd
 
         private static async Task ProcessUpdatePackages(int numOfConsumerTasks)
         {
-            using (var processItems = new BlockingCollection<string>())
+            using (var processItems = new BlockingCollection<ProcessItem>())
             {
                 var producerActionParams = new ProducerActionParameters(processItems);
                 using (var producerTask = Task<int>.Factory.StartNew(ProducerAction, producerActionParams, TaskCreationOptions.PreferFairness))
@@ -30,6 +30,7 @@ namespace updbcmd
                             consumerTasks[i] = Task<int>.Factory.StartNew(ConsumerAction, consumerActionParams, TaskCreationOptions.LongRunning);
                         }
 
+                        // Combine the producer task and consumer tasks to wait for finish all task.
                         var allTasks = new Task[1 + consumerTasks.Length];
                         allTasks[0] = producerTask;
                         Array.Copy(consumerTasks, 0, allTasks, 1, consumerTasks.Length);
@@ -51,11 +52,23 @@ namespace updbcmd
             }
         }
 
+        internal sealed class ProcessItem
+        {
+            public string FilePath { get; private set; }
+            public Guid CorrelationId { get; private set; }
+
+            public ProcessItem(string filePath)
+            {
+                FilePath = filePath;
+                CorrelationId = new Guid();
+            }
+        }
+
         internal sealed class ProducerActionParameters
         {
-            public BlockingCollection<string> ProcessItems { get; private set; }
+            public BlockingCollection<ProcessItem> ProcessItems { get; private set; }
 
-            public ProducerActionParameters(BlockingCollection<string> processItems)
+            public ProducerActionParameters(BlockingCollection<ProcessItem> processItems)
             {
                 ProcessItems = processItems;
             }
@@ -71,7 +84,7 @@ namespace updbcmd
             {
                 var filePath = Console.ReadLine()?.Trim(trimChars);
                 if (string.IsNullOrWhiteSpace(filePath)) break;
-                ap.ProcessItems.Add(filePath);
+                ap.ProcessItems.Add(new ProcessItem(filePath));
                 count++;
             }
             ap.ProcessItems.CompleteAdding();
@@ -81,9 +94,9 @@ namespace updbcmd
 
         internal sealed class ConsumerActionParameters
         {
-            public BlockingCollection<string> ProcessItems { get; private set; }
+            public BlockingCollection<ProcessItem> ProcessItems { get; private set; }
 
-            public ConsumerActionParameters(BlockingCollection<string> processItems)
+            public ConsumerActionParameters(BlockingCollection<ProcessItem> processItems)
             {
                 ProcessItems = processItems;
             }
@@ -95,17 +108,17 @@ namespace updbcmd
             var count = 0;
             while (true)
             {
-                string filePath;
+                ProcessItem item;
                 try
                 {
-                    filePath = ap.ProcessItems.Take();
+                    item = ap.ProcessItems.Take();
                 }
                 catch (InvalidOperationException)
                 {
                     Console.WriteLine("Complete take: {0}", count);
                     break;
                 }
-                var updatePackage = UpdatePackage.RetrieveData(filePath);
+                var updatePackage = UpdatePackage.RetrieveData(item.FilePath);
                 count++;
             }
             return count;
