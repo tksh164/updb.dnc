@@ -9,7 +9,8 @@ namespace updbcmd
     {
         static async Task Main(string[] args)
         {
-            await ProcessUpdatePackages(6);
+            const int ConsumerThreadCount = 6;
+            await ProcessUpdatePackages(ConsumerThreadCount);
         }
 
         private static async Task ProcessUpdatePackages(int numOfConsumerTasks)
