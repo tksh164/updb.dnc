@@ -5,7 +5,7 @@ namespace UPDB.Gathering
 {
     public class UnknownUpdatePackageTypeException : Exception
     {
-        public string UpdatePackageFilePath { get; private set; }
+        public string UpdatePackageFilePath { get; protected set; }
 
         public UnknownUpdatePackageTypeException(string updatePackageFilePath)
             : this(updatePackageFilePath, null)
@@ -20,9 +20,9 @@ namespace UPDB.Gathering
 
     public class ExternalCommandException : Exception
     {
-        public Process Process { get; private set; }
-        public string OutputData { get; private set; }
-        public string ErrorData { get; private set; }
+        public Process Process { get; protected set; }
+        public string OutputData { get; protected set; }
+        public string ErrorData { get; protected set; }
 
         public ExternalCommandException(Process process, string outputData, string errorData)
             : this(process, outputData, errorData, null)
@@ -39,7 +39,7 @@ namespace UPDB.Gathering
 
     public class MscfUpdatePackageDataRetrieveException : Exception
     {
-        public string UpdatePackageFilePath { get; private set; }
+        public string UpdatePackageFilePath { get; protected set; }
 
         public MscfUpdatePackageDataRetrieveException(string updatePackageFilePath)
             : this(updatePackageFilePath, null)
@@ -101,7 +101,7 @@ namespace UPDB.Gathering
 
     public class UpdateModuleDataRetrieveException : Exception
     {
-        public string UpdateModuleFilePath { get; private set; }
+        public string UpdateModuleFilePath { get; protected set; }
 
         public UpdateModuleDataRetrieveException(string updateModuleFilePath)
             : this(updateModuleFilePath, null)
