@@ -140,7 +140,7 @@ namespace updbcmd
 
             logger.WriteLog(new LogRecord()
             {
-                Message = string.Format(@"The worker ID {0} started.", ap.WorkerId),
+                Message = string.Format(@"The worker-{0} started.", ap.WorkerId),
             }, nameof(Program));
 
             var succeededCount = 0;
@@ -162,7 +162,7 @@ namespace updbcmd
                     logger.WriteLog(new LogRecord()
                     {
                         CorrelationId = item.CorrelationId,
-                        Message = string.Format(@"The processing started on the worker ID {0}.", ap.WorkerId),
+                        Message = string.Format(@"The processing started on the worker-{0}.", ap.WorkerId),
                     }, nameof(Program));
 
                     var updatePackage = UpdatePackage.RetrieveData(item.FilePath);
@@ -171,7 +171,7 @@ namespace updbcmd
                     logger.WriteLog(new LogRecord()
                     {
                         CorrelationId = item.CorrelationId,
-                        Message = string.Format(@"The processing ended on the worker ID {0}.", ap.WorkerId),
+                        Message = string.Format(@"The processing ended on the worker-{0}.", ap.WorkerId),
                     }, nameof(Program));
                 }
                 catch (Exception e)
@@ -183,7 +183,7 @@ namespace updbcmd
 
             logger.WriteLog(new LogRecord()
             {
-                Message = string.Format("The worker ID {0} ended. The results are {1} succeeded, {2} failed.", ap.WorkerId, succeededCount, failedCount),
+                Message = string.Format("The worker-{0} ended. The results are {1} succeeded, {2} failed.", ap.WorkerId, succeededCount, failedCount),
             }, nameof(Program));
 
             return (Succeeded: succeededCount, Failed: failedCount);
