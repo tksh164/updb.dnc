@@ -56,10 +56,7 @@ namespace updbcmd
                     {
                         if (consumerTasks != null)
                         {
-                            for (var i = 0; i < consumerTasks.Length; i++)
-                            {
-                                consumerTasks[i].Dispose();
-                            }
+                            foreach (var task in consumerTasks) task.Dispose();
                         }
                     }
                 }
