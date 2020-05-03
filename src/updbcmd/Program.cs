@@ -137,6 +137,8 @@ namespace updbcmd
         private static (int Succeeded, int Failed) ConsumerAction(object actionParams)
         {
             var ap = actionParams as ConsumerActionParameters;
+            var logger = Logger.GetInstance();
+
             var succeededCount = 0;
             var failedCount = 0;
             while (true)
@@ -148,7 +150,10 @@ namespace updbcmd
                 }
                 catch (InvalidOperationException)
                 {
-                    Console.WriteLine("Succeeded count: {0}, Failed count: {1}", succeededCount, failedCount);
+                    logger.WriteLog(new LogRecord()
+                    {
+                        Message = string.Format("The update package process results of the worker ID {0} are {1} succeeded, {2} failed.", ap.WorkerId, succeededCount, failedCount),
+                    }, nameof(Program));
                     break;
                 }
 
