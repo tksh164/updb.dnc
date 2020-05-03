@@ -139,6 +139,11 @@ namespace updbcmd
             var ap = actionParams as ConsumerActionParameters;
             var logger = Logger.GetInstance();
 
+            logger.WriteLog(new LogRecord()
+            {
+                Message = string.Format(@"The the worker ID {0} started.", ap.WorkerId),
+            }, nameof(Program));
+
             var succeededCount = 0;
             var failedCount = 0;
             while (true)
