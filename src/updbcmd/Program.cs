@@ -183,7 +183,7 @@ namespace updbcmd
 
             logger.WriteLog(new LogRecord()
             {
-                Message = string.Format("The update package process results of the worker ID {0} are {1} succeeded, {2} failed.", ap.WorkerId, succeededCount, failedCount),
+                Message = string.Format("The worker ID {0} ended. The results are {1} succeeded, {2} failed.", ap.WorkerId, succeededCount, failedCount),
             }, nameof(Program));
 
             return (Succeeded: succeededCount, Failed: failedCount);
