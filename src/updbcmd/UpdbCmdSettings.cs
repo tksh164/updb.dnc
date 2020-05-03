@@ -1,4 +1,8 @@
-﻿namespace updbcmd
+﻿using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
+namespace updbcmd
 {
     internal sealed class UpdbCmdSettings
     {
@@ -6,11 +10,25 @@
         public string LogFileName { get; private set; }
         public int NumOfWorkers { get; private set; }
 
-        public UpdbCmdSettings()
+        public static UpdbCmdSettings Load(string settingFilePath)
         {
-            LogFolderPath = @"D:\Temp\updb\log";
-            LogFileName = "updbcmd.txt";
-            NumOfWorkers = 6;
+            var settings = JsonConvert.DeserializeObject<SettingsFileSchema>(File.ReadAllText(settingFilePath, Encoding.UTF8));
+            return new UpdbCmdSettings()
+            { 
+                LogFolderPath = settings.LogFolderPath,
+                LogFileName = settings.LogFileName,
+                NumOfWorkers = settings.NumOfWorkers,
+            };
+        }
+
+        private UpdbCmdSettings()
+        { }
+
+        internal class SettingsFileSchema
+        {
+            public string LogFolderPath { get; set; }
+            public string LogFileName { get; set; }
+            public int NumOfWorkers { get; set; }
         }
     }
 }

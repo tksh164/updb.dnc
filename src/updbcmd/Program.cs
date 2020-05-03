@@ -10,7 +10,14 @@ namespace updbcmd
     {
         static async Task Main(string[] args)
         {
-            var settings = new UpdbCmdSettings();
+            if (args.Length < 1)
+            {
+                Console.WriteLine("updbcmd <settings-file-path>");
+                return;
+            }
+
+            var settings = UpdbCmdSettings.Load(args[0]);
+
             var logger = Logger.Initialize(settings.LogFolderPath, settings.LogFileName);
             logger.WriteLog(new LogRecord()
             {
