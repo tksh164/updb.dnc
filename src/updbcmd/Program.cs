@@ -93,6 +93,8 @@ namespace updbcmd
         private static int ProducerAction(object actionParams)
         {
             var ap = actionParams as ProducerActionParameters;
+            var logger = Logger.GetInstance();
+
             var trimChars = new char[] { ' ', '\t', '"', '\'' };
             var addedCount = 0;
             while (true)
@@ -103,7 +105,12 @@ namespace updbcmd
                 addedCount++;
             }
             ap.ProcessItems.CompleteAdding();
-            Console.WriteLine("Added count: {0}", addedCount);
+
+            logger.WriteLog(new LogRecord()
+            {
+                Message = string.Format("Added update package path count: {0}", addedCount),
+            }, nameof(Program));
+
             return addedCount;
         }
 
