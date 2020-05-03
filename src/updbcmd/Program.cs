@@ -10,17 +10,18 @@ namespace updbcmd
     {
         static async Task Main(string[] args)
         {
+            var settings = new UpdbCmdSettings();
+
             var sw = new Stopwatch();
             sw.Start();
 
-            const int ConsumerThreadCount = 6;
-            await ProcessUpdatePackages(ConsumerThreadCount);
+            await ProcessUpdatePackages(settings);
 
             sw.Stop();
             Console.WriteLine("Elapsed: {0}", sw.Elapsed.TotalSeconds);
         }
 
-        private static async Task ProcessUpdatePackages(int numOfConsumerTasks)
+        private static async Task ProcessUpdatePackages(UpdbCmdSettings settings)
         {
             using (var processItems = new BlockingCollection<ProcessItem>())
             {
@@ -31,7 +32,7 @@ namespace updbcmd
                     try
                     {
                         var consumerActionParams = new ConsumerActionParameters(processItems);
-                        consumerTasks = new Task[numOfConsumerTasks];
+                        consumerTasks = new Task[settings.ConsumerThreadCount];
                         for (var i = 0; i < consumerTasks.Length; i++)
                         {
                             consumerTasks[i] = Task<(int Succeeded, int Failed)>.Factory.StartNew(ConsumerAction, consumerActionParams, TaskCreationOptions.LongRunning);
