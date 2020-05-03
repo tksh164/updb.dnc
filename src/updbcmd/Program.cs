@@ -140,7 +140,7 @@ namespace updbcmd
 
             logger.WriteLog(new LogRecord()
             {
-                Message = string.Format(@"The the worker ID {0} started.", ap.WorkerId),
+                Message = string.Format(@"The worker ID {0} started.", ap.WorkerId),
             }, nameof(Program));
 
             var succeededCount = 0;
