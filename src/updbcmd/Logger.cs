@@ -70,19 +70,22 @@ namespace updbcmd
             return line;
         }
 
-        public void WriteCorrelationLog(LogRecord record, string correlationLogBody, string className = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = -1, [CallerFilePath] string callerFilePath = null)
+        public void WriteCorrelationLog(Guid correlationId, string correlationLogContent, string className = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = -1, [CallerFilePath] string callerFilePath = null)
         {
-            if (record.CorrelationId == null) throw new ArgumentException("The log record has not set the correlation ID.", nameof(record));
-
-            var line = WriteLog(record, className, callerMemberName, callerLineNumber, callerFilePath);
+            var logRecord = new LogRecord()
+            {
+                CorrelationId = correlationId,
+                Message = "Write the correlation log. The log has the correlation ID as the file name and it will found under the log folder.",
+            };
+            var line = WriteLog(logRecord, className, callerMemberName, callerLineNumber, callerFilePath);
 
             var builder = new StringBuilder();
             builder.AppendLine(line);
             builder.AppendLine();
-            builder.AppendLine(correlationLogBody);
+            builder.AppendLine(correlationLogContent);
             builder.AppendLine("================================");
 
-            var correlationLogFileName = record.CorrelationId.ToString() + ".txt";
+            var correlationLogFileName = logRecord.CorrelationId.ToString() + ".txt";
             var correlationLogFilePath = Path.Combine(LogFolderPath, correlationLogFileName);
             using (var stream = new FileStream(correlationLogFilePath, FileMode.Append, FileAccess.Write, FileShare.Read))
             using (var writer = new StreamWriter(stream, Encoding.UTF8))
