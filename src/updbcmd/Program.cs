@@ -36,10 +36,10 @@ namespace updbcmd
                 var itemProducerTaskParam = new ItemProducerTaskParam(processingItems);
                 using (var itemProducer = Task<int>.Factory.StartNew(ItemProducerTaskAction, itemProducerTaskParam, TaskCreationOptions.PreferFairness))
                 {
-                    Task[] workers = null;
+                    Task<(int Succeeded, int Failed)>[] workers = null;
                     try
                     {
-                        workers = new Task[settings.NumOfWorkers];
+                        workers = new Task<(int Succeeded, int Failed)>[settings.NumOfWorkers];
                         for (var i = 0; i < workers.Length; i++)
                         {
                             var workerTaskActionParam = new WorkerTaskActionParam(i, processingItems);
@@ -51,6 +51,18 @@ namespace updbcmd
                         allTasks[0] = itemProducer;
                         Array.Copy(workers, 0, allTasks, 1, workers.Length);
                         await Task.WhenAll(allTasks);
+
+                        int totalSucceeded = 0, totalFailed = 0;
+                        foreach (var worker in workers)
+                        {
+                            totalSucceeded += worker.Result.Succeeded;
+                            totalFailed += worker.Result.Failed;
+                        }
+
+                        Logger.GetInstance().WriteLog(new LogRecord()
+                        {
+                            Message = string.Format("All workers are ended. The results are {0} succeeded, {1} failed.", totalSucceeded, totalFailed),
+                        }, nameof(Program));
                     }
                     finally
                     {
@@ -60,12 +72,6 @@ namespace updbcmd
                         }
                     }
                 }
-
-                var logger = Logger.GetInstance();
-                logger.WriteLog(new LogRecord()
-                {
-                    Message = string.Format("All workers are ended."),
-                }, nameof(Program));
             }
         }
 
