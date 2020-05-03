@@ -108,14 +108,14 @@ namespace updbcmd
                 logger.WriteLog(new LogRecord()
                 {
                     CorrelationId = item.CorrelationId,
-                    Message = string.Format(@"Update package file path: ""{0}""", item.FilePath),
+                    Message = string.Format(@"Added the update package file path ""{0}""", item.FilePath),
                 }, nameof(Program));
             }
             ap.ProcessItems.CompleteAdding();
 
             logger.WriteLog(new LogRecord()
             {
-                Message = string.Format("Added update package path count: {0}", addedCount),
+                Message = string.Format("Added {0} update package paths.", addedCount),
             }, nameof(Program));
 
             return addedCount;
