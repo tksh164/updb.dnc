@@ -36,14 +36,13 @@ namespace updbcmd
                 var itemProducerTaskParam = new ItemProducerTaskParam(processingItems);
                 using (var itemProducer = Task<int>.Factory.StartNew(ItemProducerTaskAction, itemProducerTaskParam, TaskCreationOptions.PreferFairness))
                 {
-                    Task<(int Succeeded, int Failed)>[] workers = null;
+                    var workers = new Task<(int Succeeded, int Failed)>[settings.NumOfWorkers];
                     try
                     {
-                        workers = new Task<(int Succeeded, int Failed)>[settings.NumOfWorkers];
                         for (var i = 0; i < workers.Length; i++)
                         {
                             var workerTaskActionParam = new WorkerTaskActionParam(i, processingItems);
-                            workers[i] = Task<(int Succeeded, int Failed)>.Factory.StartNew(WorkerTaskAction, workerTaskActionParam, TaskCreationOptions.LongRunning);
+                            workers[i] = Task<(int, int)>.Factory.StartNew(WorkerTaskAction, workerTaskActionParam, TaskCreationOptions.LongRunning);
                         }
 
                         // Combine the producer task and consumer tasks to wait for finish all task.
@@ -58,7 +57,6 @@ namespace updbcmd
                             totalSucceeded += worker.Result.Succeeded;
                             totalFailed += worker.Result.Failed;
                         }
-
                         Logger.GetInstance().WriteLog(new LogRecord()
                         {
                             Message = string.Format("All workers are ended. The results are {0} succeeded, {1} failed.", totalSucceeded, totalFailed),
@@ -66,10 +64,7 @@ namespace updbcmd
                     }
                     finally
                     {
-                        if (workers != null)
-                        {
-                            foreach (var worker in workers) worker.Dispose();
-                        }
+                        foreach (var worker in workers) worker?.Dispose();
                     }
                 }
             }
@@ -193,7 +188,7 @@ namespace updbcmd
                 Message = string.Format("The worker-{0} ended. The results are {1} succeeded, {2} failed.", tp.WorkerId, succeededCount, failedCount),
             }, nameof(Program));
 
-            return (Succeeded: succeededCount, Failed: failedCount);
+            return (succeededCount, failedCount);
         }
     }
 }
