@@ -43,7 +43,7 @@ namespace updbcmd
                         var consumerActionParams = new ConsumerActionParameters[consumerTasks.Length];
                         for (var i = 0; i < consumerTasks.Length; i++)
                         {
-                            consumerActionParams[i] = new ConsumerActionParameters(processItems);
+                            consumerActionParams[i] = new ConsumerActionParameters(i, processItems);
                             consumerTasks[i] = Task<(int Succeeded, int Failed)>.Factory.StartNew(ConsumerAction, consumerActionParams[i], TaskCreationOptions.LongRunning);
                         }
 
@@ -124,10 +124,12 @@ namespace updbcmd
 
         internal sealed class ConsumerActionParameters
         {
+            public int WorkerId { get; private set; }
             public BlockingCollection<ProcessItem> ProcessItems { get; private set; }
 
-            public ConsumerActionParameters(BlockingCollection<ProcessItem> processItems)
+            public ConsumerActionParameters(int workerId, BlockingCollection<ProcessItem> processItems)
             {
+                WorkerId = workerId;
                 ProcessItems = processItems;
             }
         }
