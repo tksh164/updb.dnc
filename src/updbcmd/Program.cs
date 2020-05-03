@@ -178,7 +178,11 @@ namespace updbcmd
                 catch (Exception e)
                 {
                     failedCount++;
-                    Console.WriteLine(e.ToString());
+                    logger.WriteCorrelationLog(new LogRecord()
+                    {
+                        CorrelationId = item.CorrelationId,
+                        Message = string.Format(@"Write the correlation log."),
+                    }, e.ToString(), nameof(Program));
                 }
             }
 

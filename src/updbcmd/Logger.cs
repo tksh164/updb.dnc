@@ -33,7 +33,7 @@ namespace updbcmd
             LogFileName = logFileName;
         }
 
-        public void WriteLog(LogRecord record, string className = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = -1, [CallerFilePath] string callerFilePath = null)
+        public string WriteLog(LogRecord record, string className = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = -1, [CallerFilePath] string callerFilePath = null)
         {
             var parts = new string[] {
                 DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss zzz"),
@@ -66,6 +66,30 @@ namespace updbcmd
                 parts[2]
             };
             Console.Error.WriteLine(string.Join(' ', stderrParts));
+
+            return line;
+        }
+
+        public void WriteCorrelationLog(LogRecord record, string correlationLogBody, string className = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = -1, [CallerFilePath] string callerFilePath = null)
+        {
+            if (record.CorrelationId == null) throw new ArgumentException("The log record has not set the correlation ID.", nameof(record));
+
+            var line = WriteLog(record, className, callerMemberName, callerLineNumber, callerFilePath);
+
+            var builder = new StringBuilder();
+            builder.AppendLine(line);
+            builder.AppendLine();
+            builder.AppendLine(correlationLogBody);
+            builder.AppendLine("================================");
+
+            var correlationLogFileName = record.CorrelationId.ToString() + ".txt";
+            var correlationLogFilePath = Path.Combine(LogFolderPath, correlationLogFileName);
+            using (var stream = new FileStream(correlationLogFilePath, FileMode.Append, FileAccess.Write, FileShare.Read))
+            using (var writer = new StreamWriter(stream, Encoding.UTF8))
+            {
+                writer.WriteLine(builder.ToString());
+                writer.Flush();
+            }
         }
     }
 
