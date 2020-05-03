@@ -67,7 +67,7 @@ namespace updbcmd
             public ProcessItem(string filePath)
             {
                 FilePath = filePath;
-                CorrelationId = new Guid();
+                CorrelationId = Guid.NewGuid();
             }
         }
 
