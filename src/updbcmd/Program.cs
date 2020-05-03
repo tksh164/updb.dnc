@@ -154,10 +154,6 @@ namespace updbcmd
                 }
                 catch (InvalidOperationException)
                 {
-                    logger.WriteLog(new LogRecord()
-                    {
-                        Message = string.Format("The update package process results of the worker ID {0} are {1} succeeded, {2} failed.", ap.WorkerId, succeededCount, failedCount),
-                    }, nameof(Program));
                     break;
                 }
 
@@ -184,6 +180,12 @@ namespace updbcmd
                     Console.WriteLine(e.ToString());
                 }
             }
+
+            logger.WriteLog(new LogRecord()
+            {
+                Message = string.Format("The update package process results of the worker ID {0} are {1} succeeded, {2} failed.", ap.WorkerId, succeededCount, failedCount),
+            }, nameof(Program));
+
             return (Succeeded: succeededCount, Failed: failedCount);
         }
     }
