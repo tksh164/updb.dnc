@@ -63,8 +63,12 @@ namespace updbcmd
                         }
                     }
                 }
-                Console.WriteLine("IsAddingCompleted: {0}", processItems.IsAddingCompleted);
-                Console.WriteLine("IsCompleted: {0}", processItems.IsCompleted);
+
+                var logger = Logger.GetInstance();
+                logger.WriteLog(new LogRecord()
+                {
+                    Message = string.Format("All workers are ended."),
+                }, nameof(Program));
             }
         }
 
