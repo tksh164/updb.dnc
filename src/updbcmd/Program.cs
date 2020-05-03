@@ -39,11 +39,12 @@ namespace updbcmd
                     Task[] consumerTasks = null;
                     try
                     {
-                        var consumerActionParams = new ConsumerActionParameters(processItems);
                         consumerTasks = new Task[settings.ConsumerThreadCount];
+                        var consumerActionParams = new ConsumerActionParameters[consumerTasks.Length];
                         for (var i = 0; i < consumerTasks.Length; i++)
                         {
-                            consumerTasks[i] = Task<(int Succeeded, int Failed)>.Factory.StartNew(ConsumerAction, consumerActionParams, TaskCreationOptions.LongRunning);
+                            consumerActionParams[i] = new ConsumerActionParameters(processItems);
+                            consumerTasks[i] = Task<(int Succeeded, int Failed)>.Factory.StartNew(ConsumerAction, consumerActionParams[i], TaskCreationOptions.LongRunning);
                         }
 
                         // Combine the producer task and consumer tasks to wait for finish all task.
