@@ -53,10 +53,6 @@ namespace updbcmd
                 {
                     writer.WriteLine(line);
                     writer.Flush();
-                    //writer.Close();
-                    //writer.Dispose();
-                    //stream.Close();
-                    //stream.Dispose();
                 }
             }
 
