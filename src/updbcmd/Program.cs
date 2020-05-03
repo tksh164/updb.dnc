@@ -31,32 +31,32 @@ namespace updbcmd
 
         private static async Task ProcessUpdatePackages(UpdbCmdSettings settings)
         {
-            using (var processItems = new BlockingCollection<ProcessItem>())
+            using (var processingItems = new BlockingCollection<ProcessingItem>())
             {
-                var producerActionParams = new ProducerActionParameters(processItems);
-                using (var producerTask = Task<int>.Factory.StartNew(ProducerAction, producerActionParams, TaskCreationOptions.PreferFairness))
+                var itemProducerTaskParam = new ItemProducerTaskParam(processingItems);
+                using (var itemProducer = Task<int>.Factory.StartNew(ItemProducerTaskAction, itemProducerTaskParam, TaskCreationOptions.PreferFairness))
                 {
-                    Task[] consumerTasks = null;
+                    Task[] workers = null;
                     try
                     {
-                        consumerTasks = new Task[settings.ConsumerThreadCount];
-                        for (var i = 0; i < consumerTasks.Length; i++)
+                        workers = new Task[settings.NumOfWorkers];
+                        for (var i = 0; i < workers.Length; i++)
                         {
-                            var consumerActionParam = new ConsumerActionParameters(i, processItems);
-                            consumerTasks[i] = Task<(int Succeeded, int Failed)>.Factory.StartNew(ConsumerAction, consumerActionParam, TaskCreationOptions.LongRunning);
+                            var workerTaskActionParam = new WorkerTaskActionParam(i, processingItems);
+                            workers[i] = Task<(int Succeeded, int Failed)>.Factory.StartNew(WorkerTaskAction, workerTaskActionParam, TaskCreationOptions.LongRunning);
                         }
 
                         // Combine the producer task and consumer tasks to wait for finish all task.
-                        var allTasks = new Task[1 + consumerTasks.Length];
-                        allTasks[0] = producerTask;
-                        Array.Copy(consumerTasks, 0, allTasks, 1, consumerTasks.Length);
+                        var allTasks = new Task[1 + workers.Length];
+                        allTasks[0] = itemProducer;
+                        Array.Copy(workers, 0, allTasks, 1, workers.Length);
                         await Task.WhenAll(allTasks);
                     }
                     finally
                     {
-                        if (consumerTasks != null)
+                        if (workers != null)
                         {
-                            foreach (var task in consumerTasks) task.Dispose();
+                            foreach (var worker in workers) worker.Dispose();
                         }
                     }
                 }
@@ -69,31 +69,31 @@ namespace updbcmd
             }
         }
 
-        internal sealed class ProcessItem
+        internal sealed class ProcessingItem
         {
             public string FilePath { get; private set; }
             public Guid CorrelationId { get; private set; }
 
-            public ProcessItem(string filePath)
+            public ProcessingItem(string filePath)
             {
                 FilePath = filePath;
                 CorrelationId = Guid.NewGuid();
             }
         }
 
-        internal sealed class ProducerActionParameters
+        internal sealed class ItemProducerTaskParam
         {
-            public BlockingCollection<ProcessItem> ProcessItems { get; private set; }
+            public BlockingCollection<ProcessingItem> ProcessingItems { get; private set; }
 
-            public ProducerActionParameters(BlockingCollection<ProcessItem> processItems)
+            public ItemProducerTaskParam(BlockingCollection<ProcessingItem> processingItems)
             {
-                ProcessItems = processItems;
+                ProcessingItems = processingItems;
             }
         }
 
-        private static int ProducerAction(object actionParams)
+        private static int ItemProducerTaskAction(object taskParam)
         {
-            var ap = actionParams as ProducerActionParameters;
+            var tp = taskParam as ItemProducerTaskParam;
             var logger = Logger.GetInstance();
 
             var trimChars = new char[] { ' ', '\t', '"', '\'' };
@@ -102,8 +102,8 @@ namespace updbcmd
             {
                 var filePath = Console.ReadLine()?.Trim(trimChars);
                 if (string.IsNullOrWhiteSpace(filePath)) break;
-                var item = new ProcessItem(filePath);
-                ap.ProcessItems.Add(item);
+                var item = new ProcessingItem(filePath);
+                tp.ProcessingItems.Add(item);
                 addedCount++;
 
                 logger.WriteLog(new LogRecord()
@@ -112,7 +112,7 @@ namespace updbcmd
                     Message = string.Format(@"Added the update package file path ""{0}""", item.FilePath),
                 }, nameof(Program));
             }
-            ap.ProcessItems.CompleteAdding();
+            tp.ProcessingItems.CompleteAdding();
 
             logger.WriteLog(new LogRecord()
             {
@@ -122,36 +122,36 @@ namespace updbcmd
             return addedCount;
         }
 
-        internal sealed class ConsumerActionParameters
+        internal sealed class WorkerTaskActionParam
         {
             public int WorkerId { get; private set; }
-            public BlockingCollection<ProcessItem> ProcessItems { get; private set; }
+            public BlockingCollection<ProcessingItem> ProcessingItems { get; private set; }
 
-            public ConsumerActionParameters(int workerId, BlockingCollection<ProcessItem> processItems)
+            public WorkerTaskActionParam(int workerId, BlockingCollection<ProcessingItem> processingItems)
             {
                 WorkerId = workerId;
-                ProcessItems = processItems;
+                ProcessingItems = processingItems;
             }
         }
 
-        private static (int Succeeded, int Failed) ConsumerAction(object actionParams)
+        private static (int Succeeded, int Failed) WorkerTaskAction(object taskParam)
         {
-            var ap = actionParams as ConsumerActionParameters;
+            var tp = taskParam as WorkerTaskActionParam;
             var logger = Logger.GetInstance();
 
             logger.WriteLog(new LogRecord()
             {
-                Message = string.Format(@"The worker-{0} started.", ap.WorkerId),
+                Message = string.Format(@"The worker-{0} started.", tp.WorkerId),
             }, nameof(Program));
 
             var succeededCount = 0;
             var failedCount = 0;
             while (true)
             {
-                ProcessItem item;
+                ProcessingItem item;
                 try
                 {
-                    item = ap.ProcessItems.Take();
+                    item = tp.ProcessingItems.Take();
                 }
                 catch (InvalidOperationException)
                 {
@@ -163,7 +163,7 @@ namespace updbcmd
                     logger.WriteLog(new LogRecord()
                     {
                         CorrelationId = item.CorrelationId,
-                        Message = string.Format(@"The processing started on the worker-{0}.", ap.WorkerId),
+                        Message = string.Format(@"The processing started on the worker-{0}.", tp.WorkerId),
                     }, nameof(Program));
 
                     var updatePackage = UpdatePackage.RetrieveData(item.FilePath);
@@ -172,7 +172,7 @@ namespace updbcmd
                     logger.WriteLog(new LogRecord()
                     {
                         CorrelationId = item.CorrelationId,
-                        Message = string.Format(@"The processing ended on the worker-{0}.", ap.WorkerId),
+                        Message = string.Format(@"The processing ended on the worker-{0}.", tp.WorkerId),
                     }, nameof(Program));
                 }
                 catch (Exception e)
@@ -184,7 +184,7 @@ namespace updbcmd
 
             logger.WriteLog(new LogRecord()
             {
-                Message = string.Format("The worker-{0} ended. The results are {1} succeeded, {2} failed.", ap.WorkerId, succeededCount, failedCount),
+                Message = string.Format("The worker-{0} ended. The results are {1} succeeded, {2} failed.", tp.WorkerId, succeededCount, failedCount),
             }, nameof(Program));
 
             return (Succeeded: succeededCount, Failed: failedCount);
