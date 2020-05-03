@@ -101,8 +101,15 @@ namespace updbcmd
             {
                 var filePath = Console.ReadLine()?.Trim(trimChars);
                 if (string.IsNullOrWhiteSpace(filePath)) break;
-                ap.ProcessItems.Add(new ProcessItem(filePath));
+                var item = new ProcessItem(filePath);
+                ap.ProcessItems.Add(item);
                 addedCount++;
+
+                logger.WriteLog(new LogRecord()
+                {
+                    CorrelationId = item.CorrelationId,
+                    Message = string.Format(@"Update package file path: ""{0}""", item.FilePath),
+                }, nameof(Program));
             }
             ap.ProcessItems.CompleteAdding();
 
