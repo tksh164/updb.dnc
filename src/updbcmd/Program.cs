@@ -162,7 +162,7 @@ namespace updbcmd
                     logger.WriteLog(new LogRecord()
                     {
                         CorrelationId = item.CorrelationId,
-                        Message = string.Format(@"The process started on the worker ID {0}.", ap.WorkerId),
+                        Message = string.Format(@"The processing started on the worker ID {0}.", ap.WorkerId),
                     }, nameof(Program));
 
                     var updatePackage = UpdatePackage.RetrieveData(item.FilePath);
@@ -171,7 +171,7 @@ namespace updbcmd
                     logger.WriteLog(new LogRecord()
                     {
                         CorrelationId = item.CorrelationId,
-                        Message = string.Format(@"The process ended on the worker ID {0}.", ap.WorkerId),
+                        Message = string.Format(@"The processing ended on the worker ID {0}.", ap.WorkerId),
                     }, nameof(Program));
                 }
                 catch (Exception e)
