@@ -11,6 +11,11 @@ namespace updbcmd
         static async Task Main(string[] args)
         {
             var settings = new UpdbCmdSettings();
+            var logger = Logger.Initialize(settings.LogFolderPath, settings.LogFileName);
+            logger.WriteLog(new LogRecord()
+            {
+                Message = string.Format("---- Logging started ----"),
+            }, nameof(Program));
 
             var sw = new Stopwatch();
             sw.Start();
@@ -18,7 +23,10 @@ namespace updbcmd
             await ProcessUpdatePackages(settings);
 
             sw.Stop();
-            Console.WriteLine("Elapsed: {0}", sw.Elapsed.TotalSeconds);
+            logger.WriteLog(new LogRecord()
+            {
+                Message = string.Format("The elapsed time was {0} seconds.", sw.Elapsed.TotalSeconds),
+            }, nameof(Program));
         }
 
         private static async Task ProcessUpdatePackages(UpdbCmdSettings settings)
