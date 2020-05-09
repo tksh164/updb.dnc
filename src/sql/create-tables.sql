@@ -10,7 +10,7 @@ GO
 CREATE TABLE [dbo].[update_packages]
 (
     [id]                [int] IDENTITY(1,1) NOT NULL,  -- The update package's ID.
-    [file_name]         [nvarchar](1024) NOT NULL,        -- The update package's file name.
+    [file_name]         [nvarchar](260) NOT NULL,        -- The update package's file name.
     [file_hash_sha1]    [binary](20) NOT NULL             -- The update package's file hash that computed with SHA1.
 )
 ON [PRIMARY]
@@ -20,7 +20,7 @@ GO
 CREATE TABLE [dbo].[update_modules]
 (
     [id]                [int] IDENTITY(1,1) NOT NULL,  -- The update module's ID.
-    [file_name]         [nvarchar](1024) NOT NULL,        -- The update module's file name.
+    [file_name]         [nvarchar](260) NOT NULL,        -- The update module's file name.
     [file_hash_sha1]    [binary](20) NOT NULL             -- The update module's file hash that computed with SHA1.
 )
 ON [PRIMARY]
